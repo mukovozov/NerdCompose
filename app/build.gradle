@@ -70,7 +70,10 @@ dependencies {
             Libs.Accompanist.insets,
 
             Libs.AndroidX.Activity.activityCompose,
-            Libs.AndroidX.Lifecycle.viewModelCompose
+            Libs.AndroidX.Lifecycle.viewModelCompose,
+
+            Libs.rxJava,
+            Libs.rxAndroid
 
     )
 }
