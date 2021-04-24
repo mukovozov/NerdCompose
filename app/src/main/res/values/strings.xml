@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">NerdCompose</string>
-    <string name="home_feed">Feed</string>
+
+    <string name="feed_app_bar_title">Feed</string>
     <string name="home_browse">Browse</string>
     <string name="home_profile">Profile</string>
 </resources>
