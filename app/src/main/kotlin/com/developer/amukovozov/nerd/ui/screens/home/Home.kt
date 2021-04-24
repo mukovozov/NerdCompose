@@ -25,7 +25,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigate
 import com.developer.amukovozov.nerd.ui.screens.Browse
-import com.developer.amukovozov.nerd.ui.screens.Feed
+import com.developer.amukovozov.nerd.ui.screens.feed.Feed
 import com.developer.amukovozov.nerd.ui.screens.Profile
 
 private const val KEY_ROUTE = "key_route"

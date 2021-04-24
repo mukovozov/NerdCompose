@@ -27,6 +27,9 @@ object Libs {
         const val test = "org.jetbrains.kotlinx:kotlinx-coroutines-test:$version"
     }
 
+    const val rxJava = "io.reactivex.rxjava3:rxjava:3.0.12"
+    const val rxAndroid = "io.reactivex.rxjava3:rxandroid:3.0.0"
+
     object AndroidX {
         const val coreKtx = "androidx.core:core-ktx:1.5.0-beta01"
         const val appCompat = "androidx.appcompat:appcompat:1.2.0"
