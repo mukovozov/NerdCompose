@@ -13,8 +13,8 @@ fun NerdApp(
 ) {
     val navController = rememberNavController()
 
-    ProvideWindowInsets {
-        NerdTheme {
+    NerdTheme {
+        ProvideWindowInsets {
             Home(
                 navController,
                 homeViewModel.viewState.selectedTab,

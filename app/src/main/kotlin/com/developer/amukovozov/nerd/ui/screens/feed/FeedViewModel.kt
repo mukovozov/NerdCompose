@@ -23,7 +23,7 @@ class FeedViewModel : BaseViewModel() {
             .map<ScreenState<List<Feed>>> { Content(it) }
             .startWithItem(Loading())
             //todo remove delay
-            .delay(5, TimeUnit.SECONDS)
+            .delay(2, TimeUnit.SECONDS)
             //todo add logging
             .doOnError { }
             .onErrorReturn { Stub(it) }
@@ -42,7 +42,7 @@ class FeedViewModel : BaseViewModel() {
             UserInfo(1, "mail@info.com", "nickname")
         ),
         Feed(
-            0, false, 2, FeedType.Review, Date().time, "233423sdfnksdf",
+            0, true, 2, FeedType.Review, Date().time, "233423sdfnksdf",
             Movie(438650, "", "Снегоуборщик"),
             listOf(Tag(1, "test1"), Tag(2, "test2")),
             UserInfo(1, "mail@info.com", "nickname")
