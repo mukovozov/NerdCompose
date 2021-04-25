@@ -13,17 +13,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.developer.amukovozov.nerd.R
 import com.developer.amukovozov.nerd.model.*
@@ -52,7 +48,10 @@ fun Feed(
             }
             is Content -> {
                 screenState.content?.let {
-                    FeedList(feeds = it)
+                    FeedList(
+                        feeds = it,
+                        onLikeClicked = viewModel::onLikeClicked
+                    )
                 }
             }
             is Stub -> {
@@ -64,11 +63,14 @@ fun Feed(
 }
 
 @Composable
-fun FeedList(feeds: List<Feed>) {
+fun FeedList(
+    feeds: List<Feed>,
+    onLikeClicked: (FeedId: Int, isLiked: Boolean) -> Unit
+) {
     LazyColumn {
         items(feeds) { feed ->
             FeedReviewItem(feed = feed,
-                onLikeClicked = {},
+                onLikeClicked = onLikeClicked,
                 onReviewClicked = {},
                 onUserClicked = {}
             )
@@ -79,7 +81,7 @@ fun FeedList(feeds: List<Feed>) {
 @Composable
 private fun FeedReviewItem(
     feed: Feed,
-    onLikeClicked: () -> Unit,
+    onLikeClicked: (feedId: Int, isLiked: Boolean) -> Unit,
     onReviewClicked: () -> Unit,
     onUserClicked: () -> Unit
 ) {
@@ -103,7 +105,8 @@ private fun FeedReviewItem(
                     .padding(4.dp)
             )
             UserReviewBlock(feed, onReviewClicked)
-            LikeView(
+            FeedLikeView(
+                feedId = feed.id,
                 isUserLiked = feed.isLiked,
                 likesCount = feed.likesCount,
                 onLikeClicked = onLikeClicked,
@@ -145,21 +148,23 @@ private fun UserReviewBlock(feed: Feed, onReviewClicked: () -> Unit) {
 }
 
 @Composable
-fun LikeView(
+fun FeedLikeView(
+    feedId: Int,
     isUserLiked: Boolean,
     likesCount: Int,
-    onLikeClicked: () -> Unit,
+    onLikeClicked: (FeedId: Int, isLiked: Boolean) -> Unit,
     modifier: Modifier
 ) {
     val imageVector = if (isUserLiked) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder
-    val image by remember { mutableStateOf(imageVector) }
+    var image by remember { mutableStateOf(imageVector) }
+    image = imageVector
 
     Row(
         modifier = modifier.clickable(
             interactionSource = remember { MutableInteractionSource() },
             indication = rememberRipple(bounded = false)
         ) {
-            onLikeClicked.invoke()
+            onLikeClicked.invoke(feedId, !isUserLiked)
         }, verticalAlignment = Alignment.CenterVertically
     ) {
         Crossfade(targetState = image) {
@@ -170,7 +175,9 @@ fun LikeView(
                 contentDescription = null
             )
         }
-        Text(text = likesCount.toString(), modifier = Modifier.padding(start = 4.dp, end = 4.dp))
+        if (likesCount > 0) {
+            Text(text = likesCount.toString(), modifier = Modifier.padding(start = 4.dp, end = 4.dp))
+        }
     }
 }
 
@@ -185,7 +192,7 @@ fun FeedReviewItemPreview() {
             UserInfo(1, "mail@info.com", "nickname")
         ),
         onReviewClicked = {},
-        onLikeClicked = {},
+        onLikeClicked = { id, isLiked -> },
         onUserClicked = {}
     )
 }
