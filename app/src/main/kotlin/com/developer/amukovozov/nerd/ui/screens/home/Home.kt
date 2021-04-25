@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltNavGraphViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -26,6 +27,7 @@ import com.developer.amukovozov.nerd.R
 import com.developer.amukovozov.nerd.ui.screens.Browse
 import com.developer.amukovozov.nerd.ui.screens.Profile
 import com.developer.amukovozov.nerd.ui.screens.feed.Feed
+import com.developer.amukovozov.nerd.ui.screens.feed.FeedViewModel
 import com.developer.amukovozov.nerd.ui.theme.backgroundColor
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsPadding
@@ -65,7 +67,8 @@ fun Home(
     ) { innerPadding ->
         NavHost(navController = navController, startDestination = HomeTab.Feed.route) {
             composable(HomeTab.Feed.route) {
-                Feed(navController, Modifier.padding(innerPadding))
+                val viewModel = hiltNavGraphViewModel<FeedViewModel>()
+                Feed(viewModel, navController, Modifier.padding(innerPadding))
             }
             composable(HomeTab.Search.route) { Browse(navController) }
             composable(HomeTab.Profile.route) { Profile(navController) }
