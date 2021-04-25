@@ -8,7 +8,7 @@ data class Feed(
     val creationTime: Long,
     val userReview: String,
     val movie: Movie,
-    val tags: List<Tag>,
+    val tags: List<Tag>?,
     val userInfo: UserInfo
 )
 
