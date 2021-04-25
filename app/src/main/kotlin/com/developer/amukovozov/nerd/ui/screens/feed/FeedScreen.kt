@@ -36,11 +36,10 @@ import java.util.*
 
 @Composable
 fun Feed(
+    viewModel: FeedViewModel,
     navController: NavController,
     modifier: Modifier = Modifier
 ) {
-    val viewModel: FeedViewModel = viewModel(FeedViewModel::class.java)
-
     Scaffold(modifier = modifier) {
         when (val screenState = viewModel.viewState.screenState) {
             is Loading -> {

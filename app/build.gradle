@@ -4,6 +4,7 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
 }
 
 android {
@@ -65,6 +66,7 @@ dependencies {
             Libs.AndroidX.Compose.tooling,
             Libs.AndroidX.Compose.iconsExtended,
             Libs.AndroidX.Compose.navigation,
+            Libs.AndroidX.Compose.hiltNavigation,
 
             Libs.Accompanist.coil,
             Libs.Accompanist.insets,
@@ -72,8 +74,21 @@ dependencies {
             Libs.AndroidX.Activity.activityCompose,
             Libs.AndroidX.Lifecycle.viewModelCompose,
 
-            Libs.rxJava,
-            Libs.rxAndroid
+            Libs.Network.Retrofit.core,
+            Libs.Network.Retrofit.rxJavaAdapter,
+            Libs.Network.Retrofit.moshiAdapter,
+            Libs.Network.rxJava,
+            Libs.Network.rxAndroid,
+            Libs.Network.Moshi.core,
 
+            Libs.Di.hiltAndroid,
+
+            Libs.Debugging.timber,
+            Libs.Debugging.loggingInterceptor
+    )
+
+    kapt(
+            Libs.Di.hiltKapt,
+            Libs.Network.Moshi.codegen
     )
 }

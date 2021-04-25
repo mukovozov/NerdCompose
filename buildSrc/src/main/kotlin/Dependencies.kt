@@ -27,8 +27,31 @@ object Libs {
         const val test = "org.jetbrains.kotlinx:kotlinx-coroutines-test:$version"
     }
 
-    const val rxJava = "io.reactivex.rxjava3:rxjava:3.0.12"
-    const val rxAndroid = "io.reactivex.rxjava3:rxandroid:3.0.0"
+    object Di {
+        private const val version = "2.33-beta"
+        const val hiltGradlePlugin = "com.google.dagger:hilt-android-gradle-plugin:$version"
+        const val hiltAndroid = "com.google.dagger:hilt-android:$version"
+        const val hiltKapt = "com.google.dagger:hilt-compiler:$version"
+    }
+
+    object Network {
+        object Retrofit {
+            private const val version = "2.9.0"
+            const val core = "com.squareup.retrofit2:retrofit:$version"
+            const val rxJavaAdapter = "com.squareup.retrofit2:adapter-rxjava3:$version"
+            const val moshiAdapter = "com.squareup.retrofit2:converter-moshi:$version"
+        }
+
+        object Moshi {
+            private const val version = "1.11.0"
+            const val core = "com.squareup.moshi:moshi-kotlin:$version"
+            const val codegen = "com.squareup.moshi:moshi-kotlin-codegen:$version"
+
+        }
+
+        const val rxJava = "io.reactivex.rxjava3:rxjava:3.0.12"
+        const val rxAndroid = "io.reactivex.rxjava3:rxandroid:3.0.0"
+    }
 
     object AndroidX {
         const val coreKtx = "androidx.core:core-ktx:1.5.0-beta01"
@@ -48,6 +71,7 @@ object Libs {
             const val tooling = "androidx.compose.ui:ui-tooling:${version}"
             const val iconsExtended = "androidx.compose.material:material-icons-extended:$version"
             const val navigation = "androidx.navigation:navigation-compose:1.0.0-alpha10"
+            const val hiltNavigation = "androidx.hilt:hilt-navigation-compose:1.0.0-alpha01"
         }
 
         object Activity {
@@ -63,5 +87,12 @@ object Libs {
             const val constraintLayoutCompose =
                 "androidx.constraintlayout:constraintlayout-compose:1.0.0-alpha05"
         }
+    }
+
+    object Debugging {
+        private const val timberVersion = "4.7.1"
+
+        const val timber = "com.jakewharton.timber:timber:$timberVersion"
+        const val loggingInterceptor = "com.squareup.okhttp3:logging-interceptor:4.9.1"
     }
 }
