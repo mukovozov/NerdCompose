@@ -28,6 +28,7 @@ import com.developer.amukovozov.nerd.ui.theme.primaryColor
 import com.developer.amukovozov.nerd.util.ui.Content
 import com.developer.amukovozov.nerd.util.ui.Loading
 import com.developer.amukovozov.nerd.util.ui.Stub
+import com.developer.amukovozov.nerd.util.ui.rememberTmdbPosterPainter
 import java.util.*
 
 @Composable
@@ -122,7 +123,7 @@ private fun UserReviewBlock(feed: Feed, onReviewClicked: () -> Unit) {
         .fillMaxWidth()
         .clickable { onReviewClicked.invoke() }) {
         Image(
-            painter = painterResource(R.drawable.ic_launcher_foreground),
+            painter = rememberTmdbPosterPainter(feed.movie.posterPath),
             contentDescription = null,
             modifier = Modifier
                 .clip(RoundedCornerShape(4.dp))
