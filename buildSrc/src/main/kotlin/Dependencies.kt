@@ -87,6 +87,13 @@ object Libs {
             const val constraintLayoutCompose =
                 "androidx.constraintlayout:constraintlayout-compose:1.0.0-alpha05"
         }
+
+        object Emoji {
+            private const val version = "1.2.0-alpha03"
+            const val core = "androidx.emoji:emoji:$version"
+            const val bundled = "androidx.emoji:emoji-bundled:$version"
+
+        }
     }
 
     object Debugging {
