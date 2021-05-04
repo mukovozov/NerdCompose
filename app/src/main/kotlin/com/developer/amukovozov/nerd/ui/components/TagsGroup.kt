@@ -1,11 +1,12 @@
 package com.developer.amukovozov.nerd.ui.components
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -16,6 +17,7 @@ import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.emoji.text.EmojiCompat
 import com.developer.amukovozov.nerd.model.Tag
 
 private val tagHeight = 32.dp
@@ -27,7 +29,14 @@ fun TagsGroup(modifier: Modifier = Modifier, tags: List<Tag>) {
     Layout(
         modifier = modifier,
         content = {
-            tags.map { Chip(text = it.title) }
+            tags.map {
+                Chip(
+                    text = it.title,
+                    emojiCode = it.emojiCode,
+                    backgroundColor = it.backgroundColor,
+                    textColor = it.textColor
+                )
+            }
         }) { measurables, constraints ->
         var rowCount = 1
         var measurableRawWidth = 0
@@ -79,23 +88,31 @@ fun TagsGroup(modifier: Modifier = Modifier, tags: List<Tag>) {
 }
 
 @Composable
-fun Chip(modifier: Modifier = Modifier, text: String) {
+fun Chip(
+    modifier: Modifier = Modifier,
+    text: String,
+    emojiCode: String?,
+    backgroundColor: String?,
+    textColor: String?
+) {
     Card(
         modifier = modifier,
         border = BorderStroke(color = Color.Black, width = Dp.Hairline),
-        shape = RoundedCornerShape(8.dp)
+        shape = RoundedCornerShape(8.dp),
+        backgroundColor = backgroundColor.hexToColor(defaultColor = Color.Black)
     ) {
         Row(
             modifier = Modifier.padding(start = 8.dp, top = 4.dp, end = 8.dp, bottom = 4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(
-                modifier = Modifier
-                    .size(16.dp, 16.dp)
-                    .background(color = MaterialTheme.colors.secondary)
-            )
-            Spacer(Modifier.width(4.dp))
-            Text(text = text)
+            emojiCode?.let {
+                val processed = EmojiCompat.get().process(emojiCode)
+                Text(text = processed.toString())
+                Spacer(Modifier.width(4.dp))
+            }
+
+            val tColor = textColor.hexToColor(defaultColor = Color.White)
+            Text(text = text, color = tColor)
         }
     }
 }
@@ -105,9 +122,14 @@ fun Chip(modifier: Modifier = Modifier, text: String) {
 fun TagsGroupPreview() {
     TagsGroup(
         tags = listOf(
-            Tag(title = "perviy", id = 1),
-            Tag(title = "vtoroy", id = 2),
-            Tag(title = "tretiy", id = 3)
+            Tag(1, "perviy", null, "33C22D3D", "FFC22D3D"),
+            Tag(2, "vtoroy", null, null, null),
+            Tag(3, "tretiy", null, null, null)
         )
     )
+}
+
+private fun String?.hexToColor(defaultColor: Color): Color {
+    val colorRgb = this?.toLong(radix = 16) ?: return defaultColor
+    return Color(colorRgb)
 }
