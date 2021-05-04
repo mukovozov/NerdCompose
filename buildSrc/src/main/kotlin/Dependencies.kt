@@ -56,6 +56,7 @@ object Libs {
     object AndroidX {
         const val coreKtx = "androidx.core:core-ktx:1.5.0-beta01"
         const val appCompat = "androidx.appcompat:appcompat:1.2.0"
+        const val browser = "androidx.browser:browser:1.3.0"
 
         object Compose {
             const val snapshot = ""
