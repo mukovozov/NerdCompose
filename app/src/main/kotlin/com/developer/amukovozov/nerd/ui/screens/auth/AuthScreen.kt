@@ -5,22 +5,22 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.developer.amukovozov.nerd.R
 import com.developer.amukovozov.nerd.ui.theme.backgroundColor
+import com.developer.amukovozov.nerd.util.openInChromeTab
 import com.google.accompanist.insets.navigationBarsPadding
-import com.google.accompanist.insets.statusBarsPadding
 
 @Composable
 fun AuthScreen(
     viewModel: AuthViewModel,
-    navController: NavController,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -31,10 +31,12 @@ fun AuthScreen(
         Column(
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
                 .padding(bottom = 16.dp)
         ) {
-            Button(onClick = { viewModel.onYandexAuthClicked() }) {
+            val context = LocalContext.current
+            Button(onClick = { openInChromeTab(context, AuthViewModel.YANDEX_AUTH_LINK) }) {
                 Text(text = "Войти через Яндекс", style = MaterialTheme.typography.h6)
             }
         }

@@ -38,11 +38,10 @@ fun NerdApp(
         ProvideWindowInsets {
             when (viewModel.viewState.appState) {
                 AppState.Starting -> {
-                    // splash screen
                     Timber.d("Splash Screen")
                 }
                 AppState.Auth -> {
-                    AuthScreen(authViewModel, navController)
+                    AuthScreen(authViewModel)
                 }
                 AppState.Home -> {
                     Home(
