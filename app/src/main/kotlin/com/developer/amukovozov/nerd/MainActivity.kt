@@ -1,7 +1,8 @@
 package com.developer.amukovozov.nerd
 
-import android.net.Uri
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -15,28 +16,24 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    companion object {
-        private const val APP_DEEPLINK_SCHEME = "nerd"
-        private const val AUTH_DEEPLINK_HOST = "token"
-    }
-
+    private val viewModel by viewModels<MainViewModel>()
     private val homeViewModel by viewModels<HomeViewModel>()
     private val authViewModel by viewModels<AuthViewModel>()
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        intent?.data?.let(viewModel::onTokenReceived)
+            ?: Toast.makeText(this, "Yandex fall down", Toast.LENGTH_LONG).show()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val data: Uri? = intent?.data
-
-        if (data != null && data.scheme == APP_DEEPLINK_SCHEME &&
-            data.host == AUTH_DEEPLINK_HOST
-        ) {
-            homeViewModel.onTokenReceived(data.toString())
-        }
+        viewModel.appStartedNormally()
         // This app draws behind the system bars, so we want to handle fitting system windows
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
-            NerdApp(homeViewModel, authViewModel)
+            NerdApp(viewModel, homeViewModel, authViewModel)
         }
     }
 }
