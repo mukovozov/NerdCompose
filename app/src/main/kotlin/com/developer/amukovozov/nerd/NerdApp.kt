@@ -4,7 +4,6 @@ import android.app.Application
 import androidx.compose.runtime.Composable
 import androidx.emoji.bundled.BundledEmojiCompatConfig
 import androidx.emoji.text.EmojiCompat
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.developer.amukovozov.nerd.ui.screens.auth.AuthScreen
 import com.developer.amukovozov.nerd.ui.screens.auth.AuthViewModel
@@ -27,12 +26,11 @@ class NerdApplication : Application() {
 
 @Composable
 fun NerdApp(
+    viewModel: MainViewModel,
     homeViewModel: HomeViewModel,
     authViewModel: AuthViewModel
 ) {
     val navController = rememberNavController()
-
-    val viewModel: AppViewModel = viewModel()
 
     NerdTheme {
         ProvideWindowInsets {
@@ -42,6 +40,9 @@ fun NerdApp(
                 }
                 AppState.Auth -> {
                     AuthScreen(authViewModel)
+                }
+                AppState.AuthInProgress -> {
+                    Timber.d("Show progress bar")
                 }
                 AppState.Home -> {
                     Home(
