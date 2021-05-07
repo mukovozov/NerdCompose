@@ -4,6 +4,7 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'kotlin-kapt'
+    id 'kotlin-parcelize'
     id 'dagger.hilt.android.plugin'
 }
 
@@ -70,6 +71,11 @@ dependencies {
 
             Libs.Accompanist.coil,
             Libs.Accompanist.insets,
+
+            Libs.AndroidX.Emoji.core,
+            Libs.AndroidX.Emoji.bundled,
+
+            Libs.AndroidX.browser,
 
             Libs.AndroidX.Activity.activityCompose,
             Libs.AndroidX.Lifecycle.viewModelCompose,

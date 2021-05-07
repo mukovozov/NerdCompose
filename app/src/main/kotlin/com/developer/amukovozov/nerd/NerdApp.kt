@@ -2,7 +2,11 @@ package com.developer.amukovozov.nerd
 
 import android.app.Application
 import androidx.compose.runtime.Composable
+import androidx.emoji.bundled.BundledEmojiCompatConfig
+import androidx.emoji.text.EmojiCompat
 import androidx.navigation.compose.rememberNavController
+import com.developer.amukovozov.nerd.ui.screens.auth.AuthScreen
+import com.developer.amukovozov.nerd.ui.screens.auth.AuthViewModel
 import com.developer.amukovozov.nerd.ui.screens.home.Home
 import com.developer.amukovozov.nerd.ui.screens.home.HomeViewModel
 import com.developer.amukovozov.nerd.ui.theme.NerdTheme
@@ -15,22 +19,39 @@ class NerdApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         Timber.plant(Timber.DebugTree())
+        val config = BundledEmojiCompatConfig(this)
+        EmojiCompat.init(config)
     }
 }
 
 @Composable
 fun NerdApp(
-    homeViewModel: HomeViewModel
+    viewModel: MainViewModel,
+    homeViewModel: HomeViewModel,
+    authViewModel: AuthViewModel
 ) {
     val navController = rememberNavController()
 
     NerdTheme {
         ProvideWindowInsets {
-            Home(
-                navController,
-                homeViewModel.viewState.selectedTab,
-                homeViewModel::onTabSelected
-            )
+            when (viewModel.viewState.appState) {
+                AppState.Starting -> {
+                    Timber.d("Splash Screen")
+                }
+                AppState.Auth -> {
+                    AuthScreen(authViewModel)
+                }
+                AppState.AuthInProgress -> {
+                    Timber.d("Show progress bar")
+                }
+                AppState.Home -> {
+                    Home(
+                        navController,
+                        homeViewModel.viewState.selectedTab,
+                        homeViewModel::onTabSelected
+                    )
+                }
+            }
         }
     }
 }

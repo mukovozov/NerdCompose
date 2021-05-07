@@ -3,7 +3,9 @@ package com.developer.amukovozov.nerd.repository
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class TokenRepository @Inject constructor(
     private val preferences: SharedPreferences
 ) {
@@ -17,9 +19,7 @@ class TokenRepository @Inject constructor(
         }
     }
 
-    fun getToken() = preferences.getString(TOKEN,
-        //todo добавить авторизацию
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFuZHJleUBtdWtvdm96b3YucnVzIiwiZXhwIjoxNjI3OTE3MjA3LCJvcmlnX2lhdCI6MTYxOTM2MzYwNywicGFzc3dvcmQiOiJwYXNzd29yZDEyMyJ9.qBcmv_28vGCkIWbQycTUtQFG0AjIb1cCmge9Phy8WPA")
+    fun getToken() = preferences.getString(TOKEN, "")
 
     fun clearToken() = preferences.edit { remove(TOKEN) }
 }

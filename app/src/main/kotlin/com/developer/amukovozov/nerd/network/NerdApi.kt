@@ -2,6 +2,7 @@ package com.developer.amukovozov.nerd.network
 
 import com.developer.amukovozov.nerd.model.Feed
 import com.developer.amukovozov.nerd.model.Pagination
+import com.developer.amukovozov.nerd.model.TokenInfo
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import retrofit2.http.GET
@@ -12,6 +13,9 @@ interface NerdApi {
     companion object {
         const val BASE_URL = "https://nerd-api-developing.herokuapp.com"
     }
+
+    @POST("/register/oauth")
+    fun yandexAuth(@Query("yandexToken") token: String): Single<TokenInfo>
 
     @GET("/feed")
     fun getFeed(@Query("page") page: Int): Single<Pagination<Feed>>

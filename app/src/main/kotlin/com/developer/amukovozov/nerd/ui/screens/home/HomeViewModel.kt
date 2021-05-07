@@ -3,9 +3,14 @@ package com.developer.amukovozov.nerd.ui.screens.home
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
+import com.developer.amukovozov.nerd.util.ui.BaseViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class HomeViewModel : ViewModel() {
+@HiltViewModel
+class HomeViewModel @Inject constructor(
+
+) : BaseViewModel() {
 
     var viewState by mutableStateOf(HomeViewState())
 

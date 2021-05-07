@@ -17,12 +17,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.developer.amukovozov.nerd.R
 import com.developer.amukovozov.nerd.model.*
+import com.developer.amukovozov.nerd.ui.components.TagsGroup
 import com.developer.amukovozov.nerd.ui.theme.backgroundAccentColor
 import com.developer.amukovozov.nerd.ui.theme.primaryColor
 import com.developer.amukovozov.nerd.util.ui.Content
@@ -137,6 +136,9 @@ private fun UserReviewBlock(feed: Feed, onReviewClicked: () -> Unit) {
                 style = MaterialTheme.typography.h6,
                 modifier = Modifier.fillMaxWidth()
             )
+            feed.tags?.let {
+                TagsGroup(modifier = Modifier.padding(top = 8.dp, bottom = 8.dp), tags = it)
+            }
             Text(
                 text = feed.userReview,
                 style = MaterialTheme.typography.body1,
@@ -189,7 +191,7 @@ fun FeedReviewItemPreview() {
         feed = Feed(
             0, false, 2, FeedType.Review, Date().time, "233423sdfnksdf",
             Movie(438650, "", "Снегоуборщик"),
-            listOf(Tag(1, "test1"), Tag(2, "test2")),
+            listOf(Tag(1, "test1", null, null, null), Tag(2, "test2", null, null, null)),
             UserInfo(1, "mail@info.com", "nickname")
         ),
         onReviewClicked = {},
