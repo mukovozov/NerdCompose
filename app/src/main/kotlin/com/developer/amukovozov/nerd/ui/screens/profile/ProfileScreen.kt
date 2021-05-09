@@ -1,4 +1,4 @@
-package com.developer.amukovozov.nerd.ui.screens
+package com.developer.amukovozov.nerd.ui.screens.profile
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.wrapContentSize
@@ -10,7 +10,11 @@ import androidx.navigation.NavController
 import com.developer.amukovozov.nerd.R
 
 @Composable
-fun Profile(navController: NavController, modifier: Modifier = Modifier) {
+fun ProfileScreen(
+    viewModel: ProfileViewModel,
+    navController: NavController,
+    modifier: Modifier = Modifier
+) {
     Text(
         text = stringResource(R.string.home_profile),
         modifier = modifier

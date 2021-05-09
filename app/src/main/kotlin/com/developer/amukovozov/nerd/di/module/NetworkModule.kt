@@ -2,6 +2,7 @@ package com.developer.amukovozov.nerd.di.module
 
 import com.developer.amukovozov.nerd.network.NerdApi
 import com.developer.amukovozov.nerd.network.adapter.FeedTypeAdapter
+import com.developer.amukovozov.nerd.network.adapter.SocialMediaLinkTypeAdapter
 import com.developer.amukovozov.nerd.network.interceptor.TokenInterceptor
 import com.developer.amukovozov.nerd.repository.TokenRepository
 import com.squareup.moshi.Moshi
@@ -25,6 +26,7 @@ object NetworkModule {
     fun provideMoshi(): Moshi = Moshi
         .Builder()
         .add(FeedTypeAdapter())
+        .add(SocialMediaLinkTypeAdapter())
         .build()
 
     @Provides

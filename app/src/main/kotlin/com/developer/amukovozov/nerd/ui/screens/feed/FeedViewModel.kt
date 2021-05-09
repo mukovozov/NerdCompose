@@ -74,7 +74,6 @@ class FeedViewModel @Inject constructor(
                 paginator.proceed(Paginator.Action.PageError(it))
                 Stub(it)
             }
-            .doOnNext { Timber.d(it.toString()) }
             .schedulersIoToMain()
             .subscribe { screenState ->
                 viewState = viewState.copy(screenState = screenState)

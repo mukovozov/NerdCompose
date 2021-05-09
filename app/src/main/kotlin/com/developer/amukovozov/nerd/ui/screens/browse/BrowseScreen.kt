@@ -1,4 +1,4 @@
-package com.developer.amukovozov.nerd.ui.screens
+package com.developer.amukovozov.nerd.ui.screens.browse
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.wrapContentSize

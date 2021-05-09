@@ -24,10 +24,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigate
 import com.developer.amukovozov.nerd.R
-import com.developer.amukovozov.nerd.ui.screens.Browse
-import com.developer.amukovozov.nerd.ui.screens.Profile
+import com.developer.amukovozov.nerd.ui.screens.browse.Browse
 import com.developer.amukovozov.nerd.ui.screens.feed.Feed
 import com.developer.amukovozov.nerd.ui.screens.feed.FeedViewModel
+import com.developer.amukovozov.nerd.ui.screens.profile.ProfileScreen
+import com.developer.amukovozov.nerd.ui.screens.profile.ProfileViewModel
 import com.developer.amukovozov.nerd.ui.theme.backgroundColor
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsPadding
@@ -71,7 +72,10 @@ fun Home(
                 Feed(viewModel, navController, Modifier.padding(innerPadding))
             }
             composable(HomeTab.Search.route) { Browse(navController) }
-            composable(HomeTab.Profile.route) { Profile(navController) }
+            composable(HomeTab.Profile.route) {
+                val viewModel = hiltNavGraphViewModel<ProfileViewModel>()
+                ProfileScreen(viewModel, navController)
+            }
         }
     }
 }
