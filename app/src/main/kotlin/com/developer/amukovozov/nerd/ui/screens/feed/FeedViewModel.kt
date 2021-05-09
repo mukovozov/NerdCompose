@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.developer.amukovozov.nerd.model.Feed
+import com.developer.amukovozov.nerd.network.pagination.Paginator
 import com.developer.amukovozov.nerd.repository.FeedRepository
 import com.developer.amukovozov.nerd.repository.LikeRepository
 import com.developer.amukovozov.nerd.util.rx.schedulersIoToMain
@@ -15,12 +16,26 @@ import javax.inject.Inject
 @HiltViewModel
 class FeedViewModel @Inject constructor(
     private val feedRepository: FeedRepository,
-    private val likeRepository: LikeRepository
+    private val likeRepository: LikeRepository,
+    private val paginator: Paginator.Store<Feed>
 ) : BaseViewModel() {
     var viewState by mutableStateOf(FeedViewState())
 
     init {
-        loadFeeds()
+        paginator.sideEffects
+            .subscribe { effect ->
+                when (effect) {
+                    is Paginator.SideEffect.LoadPage -> loadNewPage(effect.currentPage)
+                    is Paginator.SideEffect.ErrorEvent -> {
+                        Timber.d(effect.error)
+                    }
+                }
+            }
+        paginator.proceed(Paginator.Action.Refresh)
+    }
+
+    fun onPageEnded() {
+        paginator.proceed(Paginator.Action.LoadMore)
     }
 
     fun onLikeClicked(feedId: Int, isLiked: Boolean) {
@@ -44,13 +59,22 @@ class FeedViewModel @Inject constructor(
             .disposeOnViewModelDestroy()
     }
 
-    private fun loadFeeds() {
-        feedRepository.loadFeed()
+    private fun loadNewPage(page: Int) {
+        feedRepository.loadFeedPage(page)
             .toObservable()
-            .map<ScreenState<List<Feed>>> { Content(it) }
-            .startWithItem(Loading())
+            .map<ScreenState<List<Feed>>> {
+                paginator.proceed(Paginator.Action.NewPage(page, it))
+                val updatedList = getFeedList().toMutableList()
+                updatedList.addAll(it)
+                Content(updatedList)
+            }
+            .startWithItem(if (page == 0) Loading() else viewState.screenState)
             .doOnError(Timber::e)
-            .onErrorReturn { Stub(it) }
+            .onErrorReturn {
+                paginator.proceed(Paginator.Action.PageError(it))
+                Stub(it)
+            }
+            .doOnNext { Timber.d(it.toString()) }
             .schedulersIoToMain()
             .subscribe { screenState ->
                 viewState = viewState.copy(screenState = screenState)
@@ -59,7 +83,7 @@ class FeedViewModel @Inject constructor(
     }
 
     private fun updateFeed(feed: Feed) {
-        val updatedList = getFeedList()?.map {
+        val updatedList = getFeedList().map {
             if (it.id == feed.id) {
                 feed
             } else {
@@ -71,5 +95,5 @@ class FeedViewModel @Inject constructor(
 
     private fun findFeedById(feedId: Int) = (viewState.screenState as? Content)?.content?.find { it.id == feedId }
 
-    private fun getFeedList() = (viewState.screenState as? Content)?.content
+    private fun getFeedList() = (viewState.screenState as? Content)?.content ?: emptyList()
 }

@@ -7,6 +7,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -28,6 +29,7 @@ import com.developer.amukovozov.nerd.util.ui.Content
 import com.developer.amukovozov.nerd.util.ui.Loading
 import com.developer.amukovozov.nerd.util.ui.Stub
 import com.developer.amukovozov.nerd.util.ui.rememberTmdbPosterPainter
+import timber.log.Timber
 import java.util.*
 
 @Composable
@@ -50,7 +52,8 @@ fun Feed(
                 screenState.content?.let {
                     FeedList(
                         feeds = it,
-                        onLikeClicked = viewModel::onLikeClicked
+                        onLikeClicked = viewModel::onLikeClicked,
+                        onPageEnded = viewModel::onPageEnded
                     )
                 }
             }
@@ -65,15 +68,27 @@ fun Feed(
 @Composable
 fun FeedList(
     feeds: List<Feed>,
-    onLikeClicked: (FeedId: Int, isLiked: Boolean) -> Unit
+    onLikeClicked: (FeedId: Int, isLiked: Boolean) -> Unit,
+    onPageEnded: () -> Unit
 ) {
-    LazyColumn {
+    val listState = rememberLazyListState()
+    LazyColumn(state = listState) {
         items(feeds) { feed ->
             FeedReviewItem(feed = feed,
                 onLikeClicked = onLikeClicked,
                 onReviewClicked = {},
                 onUserClicked = {}
             )
+        }
+        if (listState.firstVisibleItemIndex > 1) {
+            Timber.d(listState.firstVisibleItemIndex.toString())
+            item {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .wrapContentWidth(Alignment.CenterHorizontally)
+                )
+            }
+            onPageEnded.invoke()
         }
     }
 }

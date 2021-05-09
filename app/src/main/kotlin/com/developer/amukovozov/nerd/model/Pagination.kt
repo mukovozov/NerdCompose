@@ -5,5 +5,5 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class Pagination<T>(
     val page: Int,
-    val results: List<T>
+    val results: List<T>?
 )
