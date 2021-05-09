@@ -11,8 +11,8 @@ class FeedRepository @Inject constructor(
     private val nerdApi: NerdApi
 ) {
 
-    fun loadFeed(): Single<List<Feed>> {
-        return nerdApi.getFeed(0)
-            .map { it.results }
+    fun loadFeedPage(page: Int): Single<List<Feed>> {
+        return nerdApi.getFeed(page)
+            .map { it.results ?: emptyList() }
     }
 }
