@@ -62,26 +62,24 @@ fun TagsGroup(modifier: Modifier = Modifier, tags: List<Tag>) {
         layout(constraints.maxWidth, tagHeight.roundToPx() * rowCount) {
             var chipX = 0
             var chipY = 0
-            var drawedRaw = 1
+            var drawedRaw = 0
             placeableToRow.entries.forEach { entry ->
                 val (placealbe, row) = entry
-                if (row == drawedRaw) {
-                    placealbe.placeRelative(
-                        x = chipX,
-                        y = chipY
-                    )
-                    chipX += placealbe.width + tagPadding.roundToPx()
-                } else {
-                    chipY = tagHeight.roundToPx() + tagPadding.roundToPx()
-                    chipX = 0
-                    placealbe.placeRelative(
-                        x = chipX,
-                        y = chipY
-                    )
+                when {
+                    drawedRaw == 0 -> {
+                        placealbe.placeRelative(x = chipX, y = chipY)
+                    }
+                    row == drawedRaw -> {
+                        chipX += placealbe.width + tagPadding.roundToPx()
+                        placealbe.placeRelative(x = chipX, y = chipY)
+                    }
+                    else -> {
+                        chipY += tagHeight.roundToPx() + tagPadding.roundToPx()
+                        chipX = 0
+                        placealbe.placeRelative(x = chipX, y = chipY)
+                    }
                 }
                 drawedRaw = row
-
-
             }
         }
     }
