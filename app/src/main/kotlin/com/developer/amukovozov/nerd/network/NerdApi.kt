@@ -1,6 +1,7 @@
 package com.developer.amukovozov.nerd.network
 
 import com.developer.amukovozov.nerd.model.Feed
+import com.developer.amukovozov.nerd.model.FullUserInfo
 import com.developer.amukovozov.nerd.model.Pagination
 import com.developer.amukovozov.nerd.model.TokenInfo
 import io.reactivex.rxjava3.core.Completable
@@ -16,6 +17,9 @@ interface NerdApi {
 
     @POST("/register/oauth")
     fun yandexAuth(@Query("yandexToken") token: String): Single<TokenInfo>
+
+    @GET("user/me")
+    fun getUserMe(): Single<FullUserInfo>
 
     @GET("/feed")
     fun getFeed(@Query("page") page: Int): Single<Pagination<Feed>>
