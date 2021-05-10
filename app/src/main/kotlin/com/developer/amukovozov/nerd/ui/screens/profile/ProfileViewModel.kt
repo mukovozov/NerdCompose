@@ -22,13 +22,21 @@ class ProfileViewModel @Inject constructor(
         loadMyProfile()
     }
 
+    fun onLogoutButtonClicked() {
+
+    }
+
+    fun onEditButtonClicked() {
+
+    }
+
     private fun loadMyProfile() {
         userRepository.getMyProfile()
             .toObservable()
             .map<ScreenState<FullUserInfo>> { Content(it) }
             .startWithItem(Loading())
-            .onErrorReturn(::Stub)
             .doOnError(Timber::e)
+            .onErrorReturn(::Stub)
             .schedulersIoToMain()
             .subscribe { viewState = viewState.copy(screenState = it) }
             .disposeOnViewModelDestroy()

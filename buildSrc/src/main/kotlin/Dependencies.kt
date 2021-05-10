@@ -5,7 +5,7 @@ object Versions {
 }
 
 object Libs {
-    const val androidGradlePlugin = "com.android.tools.build:gradle:7.0.0-alpha14"
+    const val androidGradlePlugin = "com.android.tools.build:gradle:7.0.0-alpha15"
 
     object Accompanist {
         private const val version = "0.8.1"
@@ -73,6 +73,7 @@ object Libs {
             const val iconsExtended = "androidx.compose.material:material-icons-extended:$version"
             const val navigation = "androidx.navigation:navigation-compose:1.0.0-alpha10"
             const val hiltNavigation = "androidx.hilt:hilt-navigation-compose:1.0.0-alpha01"
+            const val constraintLayout = "androidx.constraintlayout:constraintlayout-compose:1.0.0-alpha06"
         }
 
         object Activity {
@@ -82,11 +83,6 @@ object Libs {
         object Lifecycle {
             const val viewModelCompose =
                 "androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha04"
-        }
-
-        object ConstraintLayout {
-            const val constraintLayoutCompose =
-                "androidx.constraintlayout:constraintlayout-compose:1.0.0-alpha05"
         }
 
         object Emoji {

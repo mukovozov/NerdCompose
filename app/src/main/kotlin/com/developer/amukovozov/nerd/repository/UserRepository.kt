@@ -12,5 +12,6 @@ class UserRepository @Inject constructor(
 ) {
     fun getMyProfile(): Single<FullUserInfo> {
         return api.getUserMe()
+            .map { FullUserInfo(userInfo = it, 0, 0) }
     }
 }

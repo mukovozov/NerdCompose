@@ -68,6 +68,7 @@ dependencies {
             Libs.AndroidX.Compose.iconsExtended,
             Libs.AndroidX.Compose.navigation,
             Libs.AndroidX.Compose.hiltNavigation,
+            Libs.AndroidX.Compose.constraintLayout,
 
             Libs.Accompanist.coil,
             Libs.Accompanist.insets,
