@@ -44,7 +44,7 @@ fun TagsGroup(modifier: Modifier = Modifier, tags: List<Tag>) {
 
         val layoutWidth = constraints.minWidth.rangeTo(constraints.maxWidth).maxOrNull() ?: constraints.minWidth
 
-        measurables.mapIndexed { index, measurable ->
+        measurables.map { measurable ->
             val placeable = measurable.measure(constraints)
             val proposalRawWidth = measurableRawWidth + placeable.width
             measurableRawWidth = if (proposalRawWidth < layoutWidth) {

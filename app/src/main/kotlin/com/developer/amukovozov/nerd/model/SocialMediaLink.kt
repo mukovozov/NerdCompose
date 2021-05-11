@@ -1,5 +1,7 @@
 package com.developer.amukovozov.nerd.model
 
+import androidx.annotation.DrawableRes
+import com.developer.amukovozov.nerd.R
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
@@ -13,9 +15,9 @@ data class SocialMediaLink(
     val link: String
 )
 
-enum class LinkType {
-    Twitter,
-    Inst;
+enum class LinkType(@DrawableRes val icon: Int) {
+    Twitter(R.drawable.ic_twitter_logo),
+    Inst(R.drawable.ic_instagram_logo);
 
     companion object {
         val Default = Inst

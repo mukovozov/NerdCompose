@@ -47,11 +47,13 @@ fun Home(
             .background(backgroundColor)
             .navigationBarsPadding(),
         topBar = {
-            TopAppBar(modifier = Modifier.statusBarsPadding()) {
-                Text(
-                    text = stringResource(id = R.string.feed_app_bar_title),
-                    style = MaterialTheme.typography.h5
-                )
+            if (selectedTab != HomeTab.Profile) {
+                TopAppBar(modifier = Modifier.statusBarsPadding()) {
+                    Text(
+                        text = stringResource(id = R.string.feed_app_bar_title),
+                        style = MaterialTheme.typography.h5
+                    )
+                }
             }
         },
         bottomBar = {
@@ -74,7 +76,7 @@ fun Home(
             composable(HomeTab.Search.route) { Browse(navController) }
             composable(HomeTab.Profile.route) {
                 val viewModel = hiltNavGraphViewModel<ProfileViewModel>()
-                ProfileScreen(viewModel, navController)
+                ProfileScreen(viewModel, navController, Modifier.padding(innerPadding))
             }
         }
     }
