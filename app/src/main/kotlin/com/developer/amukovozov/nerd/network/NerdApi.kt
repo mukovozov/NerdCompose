@@ -16,13 +16,16 @@ interface NerdApi {
     fun yandexAuth(@Query("yandexToken") token: String): Single<TokenInfo>
 
     @GET("/user/me")
-    fun getUserMe(): Single<ProfileDetailsResponse>
+    fun getUserMe(): Single<UserInfoDetails>
 
     @GET("/followings")
     fun getMyFollowings(): Single<List<UserInfo>>
 
     @GET("/followers")
     fun getMyFollowers(): Single<List<UserInfo>>
+
+    @GET("/watchlist")
+    fun getMyWatchlist(): Single<List<Movie>>
 
     @GET("/feed")
     fun getFeed(@Query("page") page: Int): Single<Pagination<Feed>>

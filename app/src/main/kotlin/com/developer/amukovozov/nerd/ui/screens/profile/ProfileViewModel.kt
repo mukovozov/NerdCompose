@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.developer.amukovozov.nerd.model.FullUserInfo
 import com.developer.amukovozov.nerd.repository.UserRepository
+import com.developer.amukovozov.nerd.use_case.ProfileUseCase
 import com.developer.amukovozov.nerd.util.rx.schedulersIoToMain
 import com.developer.amukovozov.nerd.util.ui.*
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,7 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-    private val userRepository: UserRepository
+    private val profileUseCase: ProfileUseCase
 ) : BaseViewModel() {
 
     var viewState by mutableStateOf(ProfileViewState())
@@ -31,7 +32,7 @@ class ProfileViewModel @Inject constructor(
     }
 
     private fun loadMyProfile() {
-        userRepository.getMyProfile()
+        profileUseCase.getMyProfile()
             .toObservable()
             .map<ScreenState<FullUserInfo>> { Content(it) }
             .startWithItem(Loading())

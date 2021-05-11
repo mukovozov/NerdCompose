@@ -1,7 +1,8 @@
 package com.developer.amukovozov.nerd.model
 
 data class FullUserInfo(
-    val userInfo: ProfileDetailsResponse,
+    val userInfo: UserInfoDetails,
     val followings: Int,
-    val followers: Int
+    val followers: Int,
+    val watchList: List<Movie>
 )

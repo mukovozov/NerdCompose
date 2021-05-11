@@ -2,15 +2,22 @@ package com.developer.amukovozov.nerd.ui.screens.profile
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -18,12 +25,14 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.navigation.NavController
 import coil.transform.CircleCropTransformation
+import com.developer.amukovozov.nerd.R
 import com.developer.amukovozov.nerd.model.FullUserInfo
-import com.developer.amukovozov.nerd.model.ProfileDetailsResponse
+import com.developer.amukovozov.nerd.model.Movie
+import com.developer.amukovozov.nerd.model.SocialMediaLink
+import com.developer.amukovozov.nerd.model.UserInfoDetails
 import com.developer.amukovozov.nerd.ui.theme.primaryColor
-import com.developer.amukovozov.nerd.util.ui.Content
-import com.developer.amukovozov.nerd.util.ui.Loading
-import com.developer.amukovozov.nerd.util.ui.Stub
+import com.developer.amukovozov.nerd.util.openInChromeTab
+import com.developer.amukovozov.nerd.util.ui.*
 import com.google.accompanist.coil.rememberCoilPainter
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsPadding
@@ -39,13 +48,17 @@ fun ProfileScreen(
             .statusBarsPadding()
             .navigationBarsPadding()
     ) {
+        val context = getContext()
         when (val screenState = viewModel.viewState.screenState) {
             is Content -> {
                 screenState.content?.let {
                     ProfileInfo(
                         fullUserInfo = it,
                         onLogoutButtonClicked = viewModel::onLogoutButtonClicked,
-                        onEditButtonClicked = viewModel::onEditButtonClicked
+                        onEditButtonClicked = viewModel::onEditButtonClicked,
+                        onLinkClicked = { link ->
+                            openInChromeTab(context, link.link)
+                        }
                     )
                 }
             }
@@ -69,13 +82,14 @@ fun ProfileInfo(
     fullUserInfo: FullUserInfo,
     onLogoutButtonClicked: () -> Unit,
     onEditButtonClicked: () -> Unit,
+    onLinkClicked: (SocialMediaLink) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val userInfo = fullUserInfo.userInfo
     ConstraintLayout(modifier) {
         val (iconLogout, iconEdit, avatar,
             nickname, followersAndFollowings,
-            description, linksList
+            description, linksList, watchList
         ) = createRefs()
 
         Icon(imageVector = Icons.Filled.Logout, contentDescription = null,
@@ -108,8 +122,7 @@ fun ProfileInfo(
 
         Text(
             text = userInfo.nickname,
-            style = MaterialTheme.typography.h6,
-            color = primaryColor,
+            style = MaterialTheme.typography.h5,
             modifier = Modifier.constrainAs(nickname) {
                 width = Dimension.fillToConstraints
                 top.linkTo(avatar.bottom, margin = 8.dp)
@@ -117,34 +130,14 @@ fun ProfileInfo(
                 end.linkTo(parent.end, margin = 24.dp)
             }
         )
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.constrainAs(followersAndFollowings) {
+        ProfileFollowingsAndFollowersView(
+            fullUserInfo,
+            Modifier.constrainAs(followersAndFollowings) {
                 top.linkTo(nickname.bottom, margin = 16.dp)
                 start.linkTo(parent.start, margin = 24.dp)
                 end.linkTo(parent.end, margin = 24.dp)
-            }
-        ) {
-            Text(
-                text = "${fullUserInfo.followers}\n подписчиков",
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .weight(1f)
-                    .wrapContentWidth(Alignment.CenterHorizontally)
-                    .border(width = 2.dp, primaryColor, RoundedCornerShape(8.dp))
-                    .padding(8.dp)
-            )
-            Text(
-                text = "${fullUserInfo.followings}\n подписок",
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .weight(1f)
-                    .wrapContentWidth(Alignment.CenterHorizontally)
-                    .border(width = 2.dp, primaryColor, RoundedCornerShape(8.dp))
-                    .padding(8.dp)
-            )
-        }
+            })
+
         userInfo.description?.let {
             Text(text = it,
                 modifier = Modifier.constrainAs(description) {
@@ -154,6 +147,112 @@ fun ProfileInfo(
                     end.linkTo(parent.end, margin = 24.dp)
                 })
         }
+        userInfo.links?.let { links ->
+            Row(verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.constrainAs(linksList) {
+                    width = Dimension.fillToConstraints
+                    top.linkTo(description.bottom, margin = 16.dp)
+                    start.linkTo(parent.start, margin = 24.dp)
+                    end.linkTo(parent.end, margin = 24.dp)
+                }) {
+                links.forEach { link ->
+                    ProfileSocialMediaLink(link = link) {
+                        onLinkClicked.invoke(it)
+                    }
+                }
+            }
+        }
+
+        Column(modifier = Modifier.constrainAs(watchList) {
+            top.linkTo(linksList.bottom, margin = 16.dp)
+            width = Dimension.fillToConstraints
+            start.linkTo(parent.start, margin = 24.dp)
+            end.linkTo(parent.end, margin = 24.dp)
+        }) {
+            Box(Modifier.fillMaxWidth()) {
+                Text(
+                    text = stringResource(R.string.watchlist_title),
+                    modifier = Modifier.align(Alignment.TopStart),
+                    style = MaterialTheme.typography.subtitle1,
+                )
+                Icon(
+                    imageVector = Icons.Filled.ArrowForward,
+                    modifier = Modifier.align(Alignment.TopEnd),
+                    contentDescription = null
+                )
+            }
+            LazyRow(modifier = Modifier.padding(top = 16.dp)) {
+                items(fullUserInfo.watchList) {
+                    WatchlistItem(it)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun WatchlistItem(movie: Movie) {
+    Column {
+        Image(
+            painter = rememberTmdbPosterPainter(movie.posterPath),
+            modifier = Modifier
+                .clip(RoundedCornerShape(12.dp))
+                .width(88.dp)
+                .height(130.dp),
+            contentDescription = null
+        )
+    }
+}
+
+@Composable
+fun ProfileFollowingsAndFollowersView(
+    fullUserInfo: FullUserInfo,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+    ) {
+        Text(
+            text = stringResource(R.string.followers_title, fullUserInfo.followers),
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .weight(1f)
+                .wrapContentWidth(Alignment.CenterHorizontally)
+                .border(width = 2.dp, primaryColor, RoundedCornerShape(12.dp))
+                .padding(8.dp)
+        )
+        Text(
+            text = stringResource(R.string.followings_title, fullUserInfo.followings),
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .weight(1f)
+                .wrapContentWidth(Alignment.CenterHorizontally)
+                .border(width = 2.dp, primaryColor, RoundedCornerShape(12.dp))
+                .padding(8.dp)
+        )
+    }
+}
+
+@Composable
+private fun ProfileSocialMediaLink(link: SocialMediaLink, onLinkClicked: (SocialMediaLink) -> Unit) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.clickable {
+            onLinkClicked.invoke(link)
+        }) {
+        Icon(
+            painter = painterResource(link.linkType.icon),
+            modifier = Modifier
+                .width(24.dp)
+                .height(24.dp),
+            contentDescription = null
+        )
+        Text(
+            text = "@${link.linkPostfix}",
+            style = MaterialTheme.typography.subtitle1,
+            modifier = Modifier.padding(start = 8.dp, end = 16.dp)
+        )
     }
 }
 
@@ -162,10 +261,12 @@ fun ProfileInfo(
 fun ProfilePreview() {
     ProfileInfo(
         FullUserInfo(
-            ProfileDetailsResponse("1", "muk@ku.ru", "kitaec", "description", null, null),
+            UserInfoDetails("1", "muk@ku.ru", "kitaec", "description", null, null),
             5,
-            56
+            56,
+            emptyList()
         ),
+        {},
         {},
         {}
     )

@@ -4,4 +4,8 @@
     <string name="feed_app_bar_title">Feed</string>
     <string name="home_browse">Browse</string>
     <string name="home_profile">Profile</string>
+
+    <string name="followers_title">Подписчики: %s</string>
+    <string name="followings_title">Подписки: %s</string>
+    <string name="watchlist_title">Посмотреть позже</string>
 </resources>

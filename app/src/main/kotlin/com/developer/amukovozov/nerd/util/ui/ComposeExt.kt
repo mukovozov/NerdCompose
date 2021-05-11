@@ -2,6 +2,11 @@ package com.developer.amukovozov.nerd.util.ui
 
 import androidx.annotation.DrawableRes
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.IntSize
+import coil.request.ImageRequest
+import coil.transform.RoundedCornersTransformation
+import coil.transform.Transformation
 import com.developer.amukovozov.nerd.R
 import com.google.accompanist.coil.rememberCoilPainter
 import com.google.accompanist.imageloading.LoadPainter
@@ -13,9 +18,10 @@ private const val BACKDROP_PATH = "w1280"
 @Composable
 fun rememberTmdbPosterPainter(
     posterPath: String?,
-    @DrawableRes previewPlaceHolder: Int = R.drawable.ic_launcher_foreground
+    @DrawableRes previewPlaceHolder: Int = R.drawable.ic_launcher_foreground,
+    requestBuilder: (ImageRequest.Builder.(size: IntSize) -> ImageRequest.Builder)? = null
 ): LoadPainter<Any> {
-    return rememberTmdbCoilPainter(POSTER_WIDTH, posterPath, previewPlaceHolder)
+    return rememberTmdbCoilPainter(POSTER_WIDTH, posterPath, previewPlaceHolder, requestBuilder)
 }
 
 @Composable
@@ -31,11 +37,16 @@ private fun rememberTmdbCoilPainter(
     width: String,
     imagePath: String?,
     //todo change placeholder
-    @DrawableRes previewPlaceHolder: Int
+    @DrawableRes previewPlaceHolder: Int,
+    requestBuilder: (ImageRequest.Builder.(size: IntSize) -> ImageRequest.Builder)? = null,
 ): LoadPainter<Any> {
     return rememberCoilPainter(
         request = "$TMDB_BASE_URL/$width/$imagePath",
+        requestBuilder = requestBuilder,
         fadeIn = true,
         previewPlaceholder = previewPlaceHolder
     )
 }
+
+@Composable
+fun getContext() = LocalContext.current
