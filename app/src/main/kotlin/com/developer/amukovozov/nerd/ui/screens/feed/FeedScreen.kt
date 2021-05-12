@@ -207,7 +207,7 @@ fun FeedReviewItemPreview() {
             0, false, 2, FeedType.Review, Date().time, "233423sdfnksdf",
             Movie(438650, "", "Снегоуборщик"),
             listOf(Tag(1, "test1", null, null, null), Tag(2, "test2", null, null, null)),
-            UserInfo(1, "mail@info.com", "nickname")
+            UserInfo(1, "mail@info.com", "nickname", "")
         ),
         onReviewClicked = {},
         onLikeClicked = { id, isLiked -> },
