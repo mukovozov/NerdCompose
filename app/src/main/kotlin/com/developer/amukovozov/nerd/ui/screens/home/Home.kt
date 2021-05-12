@@ -1,6 +1,7 @@
 package com.developer.amukovozov.nerd.ui.screens.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
@@ -18,22 +19,22 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltNavGraphViewModel
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.navigate
+import androidx.navigation.NavType
+import androidx.navigation.compose.*
 import com.developer.amukovozov.nerd.R
 import com.developer.amukovozov.nerd.ui.screens.browse.Browse
 import com.developer.amukovozov.nerd.ui.screens.feed.Feed
 import com.developer.amukovozov.nerd.ui.screens.feed.FeedViewModel
 import com.developer.amukovozov.nerd.ui.screens.profile.ProfileScreen
 import com.developer.amukovozov.nerd.ui.screens.profile.ProfileViewModel
+import com.developer.amukovozov.nerd.ui.screens.profile_list.ProfileListScreen
+import com.developer.amukovozov.nerd.ui.screens.profile_list.ProfileListType
+import com.developer.amukovozov.nerd.ui.screens.profile_list.ProfileListViewModel
 import com.developer.amukovozov.nerd.ui.theme.backgroundColor
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsPadding
-
-private const val KEY_ROUTE = "key_route"
 
 @Composable
 fun Home(
@@ -57,13 +58,14 @@ fun Home(
             }
         },
         bottomBar = {
-            BottomNavigation {
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val currentRoute = navBackStackEntry?.arguments?.getString(KEY_ROUTE) ?: HomeTab.Feed.route
-
-                navItems.forEach { screen ->
-                    val isScreenSelected = screen.route == selectedTab.route
-                    NerdBottomNavigationItem(isScreenSelected, screen, onTabSelected, navController)
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentRoute = navBackStackEntry?.arguments?.getString(KEY_ROUTE) ?: HomeTab.Feed.route
+            if (HomeTab.values().find { it.route == currentRoute } != null) {navItems
+                BottomNavigation {
+                    navItems.forEach { screen ->
+                        val isScreenSelected = screen.route == selectedTab.route
+                        NerdBottomNavigationItem(isScreenSelected, screen, onTabSelected, navController)
+                    }
                 }
             }
         }
@@ -74,9 +76,8 @@ fun Home(
                 Feed(viewModel, navController, Modifier.padding(innerPadding))
             }
             composable(HomeTab.Search.route) { Browse(navController) }
-            composable(HomeTab.Profile.route) {
-                val viewModel = hiltNavGraphViewModel<ProfileViewModel>()
-                ProfileScreen(viewModel, navController, Modifier.padding(innerPadding))
+            navigation(ProfileScreen.Destination, HomeTab.Profile.route) {
+                profileNestedNavigation(navController, innerPadding)
             }
         }
     }
@@ -111,4 +112,35 @@ enum class HomeTab(val route: String, val inactiveIcon: ImageVector, val activeI
     Feed("feed", Icons.Outlined.Home, Icons.Filled.Home),
     Search("search", Icons.Outlined.Search, Icons.Filled.Search),
     Profile("profile", Icons.Outlined.AccountCircle, Icons.Filled.AccountCircle);
+}
+
+private fun NavGraphBuilder.profileNestedNavigation(
+    navController: NavHostController,
+    innerPadding: PaddingValues
+) {
+    composable(ProfileScreen.Destination) {
+        val viewModel = hiltNavGraphViewModel<ProfileViewModel>()
+        ProfileScreen(viewModel, navController, Modifier.padding(innerPadding))
+    }
+    composable(
+        ProfileListScreen.Destination,
+        arguments = listOf(navArgument(ProfileListScreen.ProfileListTypeArgument) {
+            type = NavType.StringType
+        })
+    ) {
+        val viewModel = hiltNavGraphViewModel<ProfileListViewModel>()
+        val profileListType: ProfileListType = it.arguments?.getString("profile_list_type")
+            .run {
+                if (this == ProfileListType.Followers.name) {
+                    ProfileListType.Followers
+                } else {
+                    ProfileListType.Followings
+                }
+            }
+        ProfileListScreen(
+            viewModel = viewModel,
+            navController = navController,
+            profileListType = profileListType
+        )
+    }
 }

@@ -24,18 +24,25 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.navigation.NavController
+import androidx.navigation.compose.navigate
 import coil.transform.CircleCropTransformation
 import com.developer.amukovozov.nerd.R
 import com.developer.amukovozov.nerd.model.FullUserInfo
 import com.developer.amukovozov.nerd.model.Movie
 import com.developer.amukovozov.nerd.model.SocialMediaLink
 import com.developer.amukovozov.nerd.model.UserInfoDetails
+import com.developer.amukovozov.nerd.ui.screens.profile_list.ProfileListType
 import com.developer.amukovozov.nerd.ui.theme.primaryColor
 import com.developer.amukovozov.nerd.util.openInChromeTab
 import com.developer.amukovozov.nerd.util.ui.*
 import com.google.accompanist.coil.rememberCoilPainter
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsPadding
+
+
+object ProfileScreen {
+    const val Destination = "my_profile"
+}
 
 @Composable
 fun ProfileScreen(
@@ -56,6 +63,12 @@ fun ProfileScreen(
                         fullUserInfo = it,
                         onLogoutButtonClicked = viewModel::onLogoutButtonClicked,
                         onEditButtonClicked = viewModel::onEditButtonClicked,
+                        onFollowersClicked = {
+                            navController.navigate("profile_list/${ProfileListType.Followers.name}")
+                        },
+                        onFollowingsClicked = {
+                            navController.navigate("profile_list/${ProfileListType.Followings.name}")
+                        },
                         onLinkClicked = { link ->
                             openInChromeTab(context, link.link)
                         }
@@ -82,6 +95,8 @@ fun ProfileInfo(
     fullUserInfo: FullUserInfo,
     onLogoutButtonClicked: () -> Unit,
     onEditButtonClicked: () -> Unit,
+    onFollowersClicked: () -> Unit,
+    onFollowingsClicked: () -> Unit,
     onLinkClicked: (SocialMediaLink) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -132,6 +147,8 @@ fun ProfileInfo(
         )
         ProfileFollowingsAndFollowersView(
             fullUserInfo,
+            onFollowersClicked,
+            onFollowingsClicked,
             Modifier.constrainAs(followersAndFollowings) {
                 top.linkTo(nickname.bottom, margin = 16.dp)
                 start.linkTo(parent.start, margin = 24.dp)
@@ -207,6 +224,8 @@ fun WatchlistItem(movie: Movie) {
 @Composable
 fun ProfileFollowingsAndFollowersView(
     fullUserInfo: FullUserInfo,
+    onFollowersClicked: () -> Unit,
+    onFollowingsClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -214,22 +233,28 @@ fun ProfileFollowingsAndFollowersView(
         modifier = modifier
     ) {
         Text(
-            text = stringResource(R.string.followers_title, fullUserInfo.followers),
+            text = stringResource(R.string.followers_with_count_title, fullUserInfo.followers),
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .weight(1f)
                 .wrapContentWidth(Alignment.CenterHorizontally)
                 .border(width = 2.dp, primaryColor, RoundedCornerShape(12.dp))
                 .padding(8.dp)
+                .clickable {
+                    onFollowersClicked.invoke()
+                }
         )
         Text(
-            text = stringResource(R.string.followings_title, fullUserInfo.followings),
+            text = stringResource(R.string.followings_with_count_title, fullUserInfo.followings),
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .weight(1f)
                 .wrapContentWidth(Alignment.CenterHorizontally)
                 .border(width = 2.dp, primaryColor, RoundedCornerShape(12.dp))
                 .padding(8.dp)
+                .clickable {
+                    onFollowingsClicked.invoke()
+                }
         )
     }
 }
@@ -266,6 +291,8 @@ fun ProfilePreview() {
             56,
             emptyList()
         ),
+        {},
+        {},
         {},
         {},
         {}

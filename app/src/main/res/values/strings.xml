@@ -5,7 +5,9 @@
     <string name="home_browse">Browse</string>
     <string name="home_profile">Profile</string>
 
-    <string name="followers_title">Подписчики: %s</string>
-    <string name="followings_title">Подписки: %s</string>
+    <string name="followers_title">Подписчики</string>
+    <string name="followings_title">Подписки</string>
+    <string name="followers_with_count_title">Подписчики: %s</string>
+    <string name="followings_with_count_title">Подписки: %s</string>
     <string name="watchlist_title">Посмотреть позже</string>
 </resources>
