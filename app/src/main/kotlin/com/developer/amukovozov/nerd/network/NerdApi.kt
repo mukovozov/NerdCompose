@@ -25,7 +25,7 @@ interface NerdApi {
     fun getMyFollowers(): Single<List<UserInfo>>
 
     @GET("/watchlist")
-    fun getMyWatchlist(): Single<List<Movie>>
+    fun getMyWatchlist(@Query("page") page: Int): Single<Pagination<Movie>>
 
     @GET("/feed")
     fun getFeed(@Query("page") page: Int): Single<Pagination<Feed>>

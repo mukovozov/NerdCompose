@@ -12,12 +12,17 @@ class ProfileUseCase @Inject constructor(
     private val userRepository: UserRepository,
     private val watchlistRepository: WatchlistRepository
 ) {
+
+    companion object {
+        private const val START_PAGE = 0
+    }
+
     fun getMyProfile(): Single<FullUserInfo> {
         return Single.zip(
             userRepository.getMyUserInfo(),
             userRepository.getMyFollowings(),
             userRepository.getMyFollowers(),
-            watchlistRepository.getMyWatchlist()
+            watchlistRepository.loadMyWatchlistByPage(START_PAGE)
         ) { userInfo, followings, followers, watchlist ->
             FullUserInfo(
                 userInfo = userInfo,

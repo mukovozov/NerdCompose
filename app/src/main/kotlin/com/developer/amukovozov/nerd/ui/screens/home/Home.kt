@@ -60,7 +60,7 @@ fun Home(
         bottomBar = {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.arguments?.getString(KEY_ROUTE) ?: HomeTab.Feed.route
-            if (HomeTab.values().find { it.route == currentRoute } != null) {navItems
+            if (HomeTab.values().find { it.route == currentRoute } != null) {
                 BottomNavigation {
                     navItems.forEach { screen ->
                         val isScreenSelected = screen.route == selectedTab.route
@@ -76,7 +76,7 @@ fun Home(
                 Feed(viewModel, navController, Modifier.padding(innerPadding))
             }
             composable(HomeTab.Search.route) { Browse(navController) }
-            navigation(ProfileScreen.Destination, HomeTab.Profile.route) {
+            navigation(HomeTab.Profile.route, ProfileScreen.Destination) {
                 profileNestedNavigation(navController, innerPadding)
             }
         }
@@ -118,7 +118,7 @@ private fun NavGraphBuilder.profileNestedNavigation(
     navController: NavHostController,
     innerPadding: PaddingValues
 ) {
-    composable(ProfileScreen.Destination) {
+    composable(HomeTab.Profile.route) {
         val viewModel = hiltNavGraphViewModel<ProfileViewModel>()
         ProfileScreen(viewModel, navController, Modifier.padding(innerPadding))
     }

@@ -6,6 +6,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,21 +45,8 @@ fun ProfileListScreen(
 ) {
     viewModel.onStartPage(profileListType)
     Scaffold(
-        modifier = modifier
-            .navigationBarsPadding(),
-        topBar = {
-            val tabBarTitleId = if (profileListType == ProfileListType.Followers) {
-                R.string.followers_title
-            } else {
-                R.string.followings_title
-            }
-            TopAppBar(modifier = Modifier.statusBarsPadding()) {
-                Text(
-                    text = stringResource(tabBarTitleId),
-                    style = MaterialTheme.typography.h5
-                )
-            }
-        }
+        modifier = modifier.navigationBarsPadding(),
+        topBar = { ProfileListTabBar(navController, profileListType) }
     ) {
         when (val screenState = viewModel.viewState.screenState) {
             is Content -> {
@@ -81,6 +70,29 @@ fun ProfileListScreen(
                 // todo show stub
             }
         }
+    }
+}
+
+@Composable
+private fun ProfileListTabBar(navController: NavController, profileListType: ProfileListType) {
+    val tabBarTitleId = if (profileListType == ProfileListType.Followers) {
+        R.string.followers_title
+    } else {
+        R.string.followings_title
+    }
+    TopAppBar(
+        modifier = Modifier.statusBarsPadding()
+    ) {
+        IconButton(onClick = {
+            navController.navigateUp()
+        }) {
+            Icon(Icons.Filled.ArrowBack, contentDescription = null)
+        }
+        Text(
+            text = stringResource(tabBarTitleId),
+            style = MaterialTheme.typography.h5,
+            modifier = Modifier.padding(start = 16.dp)
+        )
     }
 }
 

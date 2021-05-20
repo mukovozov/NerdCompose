@@ -10,7 +10,8 @@ import javax.inject.Inject
 class WatchlistRepository @Inject constructor(
     private val api: NerdApi
 ) {
-    fun getMyWatchlist(): Single<List<Movie>> {
-        return api.getMyWatchlist()
+    fun loadMyWatchlistByPage(page: Int): Single<List<Movie>> {
+        return api.getMyWatchlist(page)
+            .map { it.results ?: emptyList() }
     }
 }
