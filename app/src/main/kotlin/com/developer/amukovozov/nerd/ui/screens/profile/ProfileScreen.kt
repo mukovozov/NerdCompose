@@ -1,9 +1,9 @@
 package com.developer.amukovozov.nerd.ui.screens.profile
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -31,6 +31,7 @@ import com.developer.amukovozov.nerd.model.FullUserInfo
 import com.developer.amukovozov.nerd.model.Movie
 import com.developer.amukovozov.nerd.model.SocialMediaLink
 import com.developer.amukovozov.nerd.model.UserInfoDetails
+import com.developer.amukovozov.nerd.ui.screens.feed.FeedReviewItem
 import com.developer.amukovozov.nerd.ui.screens.profile_list.ProfileListType
 import com.developer.amukovozov.nerd.ui.theme.primaryColor
 import com.developer.amukovozov.nerd.util.openInChromeTab
@@ -101,19 +102,18 @@ fun ProfileInfo(
     modifier: Modifier = Modifier
 ) {
     val userInfo = fullUserInfo.userInfo
-    ConstraintLayout(modifier) {
+    ConstraintLayout(modifier.verticalScroll(rememberScrollState())) {
         val (iconLogout, iconEdit, avatar,
             nickname, followersAndFollowings,
-            description, linksList, watchList
+            description, linksList, watchList,
+            posts
         ) = createRefs()
-
         Icon(imageVector = Icons.Filled.Logout, contentDescription = null,
             modifier = Modifier.constrainAs(iconLogout) {
                 top.linkTo(parent.top, margin = 16.dp)
                 end.linkTo(parent.end, margin = 16.dp)
             })
-        Icon(
-            imageVector = Icons.Filled.Edit, contentDescription = null,
+        Icon(imageVector = Icons.Filled.Edit, contentDescription = null,
             modifier = Modifier.constrainAs(iconEdit) {
                 top.linkTo(parent.top, margin = 16.dp)
                 end.linkTo(iconLogout.start, margin = 16.dp)
@@ -180,29 +180,59 @@ fun ProfileInfo(
             }
         }
 
-        Column(modifier = Modifier.constrainAs(watchList) {
-            top.linkTo(linksList.bottom, margin = 16.dp)
-            width = Dimension.fillToConstraints
-            start.linkTo(parent.start, margin = 24.dp)
-            end.linkTo(parent.end, margin = 24.dp)
-        }) {
-            Box(Modifier.fillMaxWidth()) {
-                Text(
-                    text = stringResource(R.string.watchlist_title),
-                    modifier = Modifier.align(Alignment.TopStart),
-                    style = MaterialTheme.typography.subtitle1,
-                )
-                Icon(
-                    imageVector = Icons.Filled.ArrowForward,
-                    modifier = Modifier.align(Alignment.TopEnd),
-                    contentDescription = null
-                )
-            }
-            LazyRow(modifier = Modifier.padding(top = 16.dp)) {
+        ProfileCollection(
+            modifier = Modifier.constrainAs(watchList) {
+                top.linkTo(linksList.bottom, margin = 16.dp)
+                width = Dimension.fillToConstraints
+                start.linkTo(parent.start, margin = 24.dp)
+                end.linkTo(parent.end, margin = 24.dp)
+            },
+            collectionTitle = stringResource(R.string.watchlist_title),
+            items = {
                 items(fullUserInfo.watchList) {
                     WatchlistItem(it)
                 }
+            })
+        ProfileCollection(
+            modifier = Modifier.constrainAs(posts) {
+                top.linkTo(watchList.bottom, margin = 16.dp)
+                width = Dimension.fillToConstraints
+                start.linkTo(parent.start, margin = 24.dp)
+                end.linkTo(parent.end, margin = 24.dp)
+            },
+            collectionTitle = stringResource(R.string.user_posts_title)
+        ) {
+            items(fullUserInfo.posts) {
+                WatchlistItem(movie = it.movie)
             }
+        }
+    }
+}
+
+@Composable
+fun ProfileCollection(
+    modifier: Modifier,
+    collectionTitle: String,
+    items: LazyListScope.() -> Unit
+) {
+    Column(modifier = modifier) {
+        Box(Modifier.fillMaxWidth()) {
+            Text(
+                text = collectionTitle,
+                modifier = Modifier.align(Alignment.TopStart),
+                style = MaterialTheme.typography.subtitle1,
+            )
+            Icon(
+                imageVector = Icons.Filled.ArrowForward,
+                modifier = Modifier.align(Alignment.TopEnd),
+                contentDescription = null
+            )
+        }
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(top = 16.dp)
+        ) {
+            items.invoke(this)
         }
     }
 }
@@ -289,6 +319,7 @@ fun ProfilePreview() {
             UserInfoDetails("1", "muk@ku.ru", "kitaec", "description", null, null),
             5,
             56,
+            emptyList(),
             emptyList()
         ),
         {},

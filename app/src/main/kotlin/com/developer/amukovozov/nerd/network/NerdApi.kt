@@ -30,6 +30,12 @@ interface NerdApi {
     @GET("/feed")
     fun getFeed(@Query("page") page: Int): Single<Pagination<Feed>>
 
+    @GET("feed/user/me")
+    fun getMyFeed(@Query("page") page: Int): Single<Pagination<Feed>>
+
+    @GET("feed/user")
+    fun getUserFeed(@Query("id") id: Int, @Query("page") page: Int): Single<Pagination<Feed>>
+
     @POST("/feed/like")
     fun addLike(@Query("feedId") feedId: Int): Completable
 

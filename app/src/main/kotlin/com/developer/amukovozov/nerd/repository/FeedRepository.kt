@@ -15,4 +15,14 @@ class FeedRepository @Inject constructor(
         return nerdApi.getFeed(page)
             .map { it.results ?: emptyList() }
     }
+
+    fun loadMyFeedPage(page: Int): Single<List<Feed>> {
+        return nerdApi.getMyFeed(page)
+            .map { it.results ?: emptyList() }
+    }
+
+    fun loadUserFeedPage(userId: Int, page: Int): Single<List<Feed>> {
+        return nerdApi.getUserFeed(userId, page)
+            .map { it.results ?: emptyList() }
+    }
 }

@@ -1,6 +1,7 @@
 package com.developer.amukovozov.nerd.use_case
 
 import com.developer.amukovozov.nerd.model.FullUserInfo
+import com.developer.amukovozov.nerd.repository.FeedRepository
 import com.developer.amukovozov.nerd.repository.UserRepository
 import com.developer.amukovozov.nerd.repository.WatchlistRepository
 import dagger.hilt.android.scopes.ViewModelScoped
@@ -10,7 +11,8 @@ import javax.inject.Inject
 @ViewModelScoped
 class ProfileUseCase @Inject constructor(
     private val userRepository: UserRepository,
-    private val watchlistRepository: WatchlistRepository
+    private val watchlistRepository: WatchlistRepository,
+    private val feedRepository: FeedRepository
 ) {
 
     companion object {
@@ -22,13 +24,15 @@ class ProfileUseCase @Inject constructor(
             userRepository.getMyUserInfo(),
             userRepository.getMyFollowings(),
             userRepository.getMyFollowers(),
-            watchlistRepository.loadMyWatchlistByPage(START_PAGE)
-        ) { userInfo, followings, followers, watchlist ->
+            watchlistRepository.loadMyWatchlistByPage(START_PAGE),
+            feedRepository.loadMyFeedPage(START_PAGE)
+        ) { userInfo, followings, followers, watchlist, posts ->
             FullUserInfo(
                 userInfo = userInfo,
                 followings = followings.size,
                 followers = followers.size,
-                watchList = watchlist
+                watchList = watchlist,
+                posts = posts
             )
         }
     }

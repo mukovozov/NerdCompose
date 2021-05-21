@@ -94,7 +94,7 @@ fun FeedList(
 }
 
 @Composable
-private fun FeedReviewItem(
+fun FeedReviewItem(
     feed: Feed,
     onLikeClicked: (feedId: Int, isLiked: Boolean) -> Unit,
     onReviewClicked: () -> Unit,
