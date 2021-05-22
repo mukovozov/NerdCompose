@@ -18,7 +18,7 @@ class ProfileListViewModel @Inject constructor(
 ) : BaseViewModel() {
     var viewState by mutableStateOf(ProfileListViewState())
 
-    fun onStartPage(profileListType: ProfileListType) {
+    fun onScreenOpened(profileListType: ProfileListType) {
         loadUsers(profileListType)
     }
 

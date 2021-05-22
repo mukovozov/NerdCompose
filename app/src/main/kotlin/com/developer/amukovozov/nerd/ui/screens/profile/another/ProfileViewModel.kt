@@ -1,4 +1,4 @@
-package com.developer.amukovozov.nerd.ui.screens.profile
+package com.developer.amukovozov.nerd.ui.screens.profile.another
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -18,20 +18,12 @@ class ProfileViewModel @Inject constructor(
 
     var viewState by mutableStateOf(ProfileViewState())
 
-    init {
-        loadMyProfile()
+    fun onScreenOpened(userId: Int) {
+        loadProfile(userId)
     }
 
-    fun onLogoutButtonClicked() {
-
-    }
-
-    fun onEditButtonClicked() {
-
-    }
-
-    private fun loadMyProfile() {
-        profileUseCase.getMyProfile()
+    private fun loadProfile(userId: Int) {
+        profileUseCase.getUserProfile(userId)
             .toObservable()
             .map<ScreenState<FullUserInfo>> { Content(it) }
             .startWithItem(Loading())
@@ -41,4 +33,5 @@ class ProfileViewModel @Inject constructor(
             .subscribe { viewState = viewState.copy(screenState = it) }
             .disposeOnViewModelDestroy()
     }
+
 }

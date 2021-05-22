@@ -27,8 +27,10 @@ import com.developer.amukovozov.nerd.R
 import com.developer.amukovozov.nerd.ui.screens.browse.Browse
 import com.developer.amukovozov.nerd.ui.screens.feed.Feed
 import com.developer.amukovozov.nerd.ui.screens.feed.FeedViewModel
-import com.developer.amukovozov.nerd.ui.screens.profile.ProfileScreen
-import com.developer.amukovozov.nerd.ui.screens.profile.ProfileViewModel
+import com.developer.amukovozov.nerd.ui.screens.profile.another.ProfileScreen
+import com.developer.amukovozov.nerd.ui.screens.profile.another.ProfileViewModel
+import com.developer.amukovozov.nerd.ui.screens.profile.my.MyProfileScreen
+import com.developer.amukovozov.nerd.ui.screens.profile.my.MyProfileViewModel
 import com.developer.amukovozov.nerd.ui.screens.profile_list.ProfileListScreen
 import com.developer.amukovozov.nerd.ui.screens.profile_list.ProfileListType
 import com.developer.amukovozov.nerd.ui.screens.profile_list.ProfileListViewModel
@@ -76,7 +78,7 @@ fun Home(
                 Feed(viewModel, navController, Modifier.padding(innerPadding))
             }
             composable(HomeTab.Search.route) { Browse(navController) }
-            navigation(HomeTab.Profile.route, ProfileScreen.Destination) {
+            navigation(HomeTab.Profile.route, MyProfileScreen.Destination) {
                 profileNestedNavigation(navController, innerPadding)
             }
         }
@@ -119,8 +121,8 @@ private fun NavGraphBuilder.profileNestedNavigation(
     innerPadding: PaddingValues
 ) {
     composable(HomeTab.Profile.route) {
-        val viewModel = hiltNavGraphViewModel<ProfileViewModel>()
-        ProfileScreen(viewModel, navController, Modifier.padding(innerPadding))
+        val viewModel = hiltNavGraphViewModel<MyProfileViewModel>()
+        MyProfileScreen(viewModel, navController, Modifier.padding(innerPadding))
     }
     composable(
         ProfileListScreen.Destination,
@@ -129,7 +131,7 @@ private fun NavGraphBuilder.profileNestedNavigation(
         })
     ) {
         val viewModel = hiltNavGraphViewModel<ProfileListViewModel>()
-        val profileListType: ProfileListType = it.arguments?.getString("profile_list_type")
+        val profileListType: ProfileListType = it.arguments?.getString(ProfileListScreen.ProfileListTypeArgument)
             .run {
                 if (this == ProfileListType.Followers.name) {
                     ProfileListType.Followers
@@ -142,5 +144,16 @@ private fun NavGraphBuilder.profileNestedNavigation(
             navController = navController,
             profileListType = profileListType
         )
+    }
+    composable(
+        ProfileScreen.Destination,
+        arguments = listOf(navArgument(ProfileScreen.Argument) {
+            type = NavType.IntType
+        })
+    ) {
+        val viewModel = hiltNavGraphViewModel<ProfileViewModel>()
+        val userId = it.arguments?.getInt(ProfileScreen.Argument) ?: return@composable
+
+        ProfileScreen(userId, viewModel, navController)
     }
 }

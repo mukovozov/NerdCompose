@@ -1,4 +1,4 @@
-package com.developer.amukovozov.nerd.ui.screens.profile
+package com.developer.amukovozov.nerd.ui.screens.profile.another
 
 import com.developer.amukovozov.nerd.model.FullUserInfo
 import com.developer.amukovozov.nerd.util.ui.Loading

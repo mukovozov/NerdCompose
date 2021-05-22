@@ -19,6 +19,24 @@ class ProfileUseCase @Inject constructor(
         private const val START_PAGE = 0
     }
 
+    fun getUserProfile(userId: Int): Single<FullUserInfo> {
+        return Single.zip(
+            userRepository.getUserInfoById(userId),
+            userRepository.getUserFollowings(userId),
+            userRepository.getUserFollowers(userId),
+            watchlistRepository.loadUserWatchlistByPage(START_PAGE, userId),
+            feedRepository.loadUserFeedPage(START_PAGE, userId)
+        ) { userInfo, followings, followers, watchlist, posts ->
+            FullUserInfo(
+                userInfo = userInfo,
+                followings = followings.size,
+                followers = followers.size,
+                watchList = watchlist,
+                posts = posts
+            )
+        }
+    }
+
     fun getMyProfile(): Single<FullUserInfo> {
         return Single.zip(
             userRepository.getMyUserInfo(),

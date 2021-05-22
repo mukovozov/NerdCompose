@@ -10,5 +10,7 @@
     <string name="followers_with_count_title">Подписчики: %s</string>
     <string name="followings_with_count_title">Подписки: %s</string>
     <string name="watchlist_title">Посмотреть позже</string>
+    <string name="watchlist_stub_title">Я пока ничего не хочу смотреть</string>
     <string name="user_posts_title">Мои посты</string>
+    <string name="user_posts_stub_title">Я еще ничего не написал</string>
 </resources>

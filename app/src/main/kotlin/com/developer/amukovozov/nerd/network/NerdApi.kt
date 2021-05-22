@@ -18,14 +18,26 @@ interface NerdApi {
     @GET("/user/me")
     fun getUserMe(): Single<UserInfoDetails>
 
+    @GET("/user")
+    fun getUserById(@Query("id") userId: Int): Single<UserInfoDetails>
+
     @GET("/followings")
     fun getMyFollowings(): Single<List<UserInfo>>
+
+    @GET("/followings")
+    fun getUserFollowings(@Query("id") userId: Int): Single<List<UserInfo>>
 
     @GET("/followers")
     fun getMyFollowers(): Single<List<UserInfo>>
 
+    @GET("/followers")
+    fun getUserFollowers(@Query("id") userId: Int): Single<List<UserInfo>>
+
     @GET("/watchlist")
     fun getMyWatchlist(@Query("page") page: Int): Single<Pagination<Movie>>
+
+    @GET("/watchlist")
+    fun getUserWatchlist(@Query("page") page: Int, @Query("userId") userId: Int): Single<Pagination<Movie>>
 
     @GET("/feed")
     fun getFeed(@Query("page") page: Int): Single<Pagination<Feed>>

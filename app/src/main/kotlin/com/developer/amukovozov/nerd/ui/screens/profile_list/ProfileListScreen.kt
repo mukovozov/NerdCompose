@@ -1,6 +1,7 @@
 package com.developer.amukovozov.nerd.ui.screens.profile_list
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -15,9 +16,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.compose.navigate
 import coil.transform.CircleCropTransformation
 import com.developer.amukovozov.nerd.R
 import com.developer.amukovozov.nerd.model.UserInfo
+import com.developer.amukovozov.nerd.ui.screens.profile.another.ProfileScreen
 import com.developer.amukovozov.nerd.ui.theme.backgroundAccentColor
 import com.developer.amukovozov.nerd.ui.theme.primaryColor
 import com.developer.amukovozov.nerd.util.ui.Content
@@ -32,6 +35,7 @@ enum class ProfileListType {
 }
 
 object ProfileListScreen {
+    fun createDestination(listType: ProfileListType) = "profile_list/${listType.name}"
     const val Destination = "profile_list/{profile_list_type}"
     const val ProfileListTypeArgument = "profile_list_type"
 }
@@ -43,7 +47,7 @@ fun ProfileListScreen(
     navController: NavController,
     modifier: Modifier = Modifier
 ) {
-    viewModel.onStartPage(profileListType)
+    viewModel.onScreenOpened(profileListType)
     Scaffold(
         modifier = modifier.navigationBarsPadding(),
         topBar = { ProfileListTabBar(navController, profileListType) }
@@ -53,7 +57,9 @@ fun ProfileListScreen(
                 screenState.content?.let { users ->
                     LazyColumn {
                         items(users) {
-                            UserInfoItem(userInfo = it)
+                            UserInfoItem(userInfo = it) { userId ->
+                                navController.navigate(ProfileScreen.createDestination(userId))
+                            }
                         }
                     }
                 }
@@ -97,12 +103,14 @@ private fun ProfileListTabBar(navController: NavController, profileListType: Pro
 }
 
 @Composable
-fun UserInfoItem(userInfo: UserInfo) {
+fun UserInfoItem(userInfo: UserInfo, onItemClicked: (UserId: Int) -> Unit) {
     Card(
         shape = RoundedCornerShape(12.dp),
         backgroundColor = backgroundAccentColor,
         elevation = 8.dp,
-        modifier = Modifier.padding(8.dp)
+        modifier = Modifier
+            .padding(8.dp)
+            .clickable { onItemClicked.invoke(userInfo.id) }
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -135,5 +143,5 @@ fun UserInfoItemPreview() {
             "Dryupalini",
             "https://nerdbucket.s3-us-east-2.amazonaws.com/PXL_20200923_215917413.png"
         )
-    )
+    ) {}
 }

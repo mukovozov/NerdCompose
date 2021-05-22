@@ -14,4 +14,10 @@ class WatchlistRepository @Inject constructor(
         return api.getMyWatchlist(page)
             .map { it.results ?: emptyList() }
     }
+
+    fun loadUserWatchlistByPage(page: Int, userId: Int): Single<List<Movie>> {
+        return api.getUserWatchlist(page, userId)
+            .map { it.results ?: emptyList() }
+    }
+
 }
