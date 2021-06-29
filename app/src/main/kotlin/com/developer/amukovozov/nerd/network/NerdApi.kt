@@ -33,6 +33,12 @@ interface NerdApi {
     @GET("/followers")
     fun getUserFollowers(@Query("id") userId: Int): Single<List<UserInfo>>
 
+    @POST("/follow")
+    fun follow(@Query("id") userId: Int): Completable
+
+    @POST("/unfollow")
+    fun unfollow(@Query("id") userId: Int): Completable
+
     @GET("/watchlist")
     fun getMyWatchlist(@Query("page") page: Int): Single<Pagination<Movie>>
 

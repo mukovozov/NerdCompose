@@ -5,5 +5,6 @@ import com.developer.amukovozov.nerd.util.ui.Loading
 import com.developer.amukovozov.nerd.util.ui.ScreenState
 
 data class ProfileViewState(
-    val screenState: ScreenState<FullUserInfo> = Loading()
+    val screenState: ScreenState<FullUserInfo> = Loading(),
+    val isFollowButtonLoading: Boolean = false
 )

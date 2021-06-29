@@ -62,13 +62,13 @@ fun Home(
         bottomBar = {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.arguments?.getString(KEY_ROUTE) ?: HomeTab.Feed.route
-            if (HomeTab.values().find { it.route == currentRoute } != null) {
+//            if (HomeTab.values().find { it.route == currentRoute } != null) {
                 BottomNavigation {
                     navItems.forEach { screen ->
                         val isScreenSelected = screen.route == selectedTab.route
                         NerdBottomNavigationItem(isScreenSelected, screen, onTabSelected, navController)
                     }
-                }
+//                }
             }
         }
     ) { innerPadding ->
@@ -128,6 +128,9 @@ private fun NavGraphBuilder.profileNestedNavigation(
         ProfileListScreen.Destination,
         arguments = listOf(navArgument(ProfileListScreen.ProfileListTypeArgument) {
             type = NavType.StringType
+        },
+        navArgument(ProfileListScreen.UserIdTypeArgument){
+            type = NavType.IntType
         })
     ) {
         val viewModel = hiltNavGraphViewModel<ProfileListViewModel>()
@@ -139,10 +142,12 @@ private fun NavGraphBuilder.profileNestedNavigation(
                     ProfileListType.Followings
                 }
             }
+        val userId = it.arguments?.getInt(ProfileListScreen.UserIdTypeArgument)
         ProfileListScreen(
             viewModel = viewModel,
             navController = navController,
-            profileListType = profileListType
+            profileListType = profileListType,
+            userId = userId
         )
     }
     composable(

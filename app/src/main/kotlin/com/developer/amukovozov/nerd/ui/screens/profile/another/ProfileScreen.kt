@@ -1,12 +1,9 @@
 package com.developer.amukovozov.nerd.ui.screens.profile.another
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Scaffold
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,7 +13,7 @@ import androidx.navigation.compose.navigate
 import com.developer.amukovozov.nerd.model.FullUserInfo
 import com.developer.amukovozov.nerd.model.SocialMediaLink
 import com.developer.amukovozov.nerd.ui.screens.feed.FeedReviewItem
-import com.developer.amukovozov.nerd.ui.screens.profile.ProfileInformation
+import com.developer.amukovozov.nerd.ui.screens.profile.*
 import com.developer.amukovozov.nerd.ui.screens.profile_list.ProfileListScreen
 import com.developer.amukovozov.nerd.ui.screens.profile_list.ProfileListType
 import com.developer.amukovozov.nerd.ui.theme.primaryColor
@@ -52,17 +49,24 @@ fun ProfileScreen(
         val context = getContext()
         when (val screenState = viewModel.viewState.screenState) {
             is Content -> {
-                screenState.content?.let {
+                screenState.content?.let { userInfo ->
                     ProfileInfo(
-                        fullUserInfo = it,
-                        onFollowersClicked = {
-                            navController.navigate(ProfileListScreen.createDestination(ProfileListType.Followers))
+                        fullUserInfo = userInfo,
+                        onFollowersClicked = { userId ->
+                            navController.navigate(
+                                ProfileListScreen.createDestination(ProfileListType.Followers, userId)
+                            )
                         },
-                        onFollowingsClicked = {
-                            navController.navigate(ProfileListScreen.createDestination(ProfileListType.Followings))
+                        onFollowingsClicked = { userId ->
+                            navController.navigate(
+                                ProfileListScreen.createDestination(ProfileListType.Followings, userId)
+                            )
                         },
                         onLinkClicked = { link ->
                             openInChromeTab(context, link.link)
+                        },
+                        onFollowButtonClicked = {
+                            viewModel.onFollowButtonClicked(it, userId)
                         }
                     )
                 }
@@ -86,9 +90,10 @@ fun ProfileScreen(
 @Composable
 private fun ProfileInfo(
     fullUserInfo: FullUserInfo,
-    onFollowersClicked: () -> Unit,
-    onFollowingsClicked: () -> Unit,
+    onFollowersClicked: (userId: Int) -> Unit,
+    onFollowingsClicked: (userId: Int) -> Unit,
     onLinkClicked: (SocialMediaLink) -> Unit,
+    onFollowButtonClicked: (isFollowedByYou: Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(modifier = modifier.padding(top = 16.dp)) {
@@ -97,7 +102,8 @@ private fun ProfileInfo(
                 fullUserInfo = fullUserInfo,
                 onFollowersClicked = onFollowersClicked,
                 onFollowingsClicked = onFollowingsClicked,
-                onLinkClicked = onLinkClicked
+                onLinkClicked = onLinkClicked,
+                onFollowButtonClicked = onFollowButtonClicked
             )
         }
         if (fullUserInfo.posts.isNotEmpty()) {
@@ -109,6 +115,53 @@ private fun ProfileInfo(
 }
 
 @Composable
-private fun FollowButton() {
+private fun ProfileInformation(
+    fullUserInfo: FullUserInfo,
+    onFollowersClicked: (userId: Int) -> Unit,
+    onFollowingsClicked: (userId: Int) -> Unit,
+    onLinkClicked: (SocialMediaLink) -> Unit,
+    onFollowButtonClicked: (isFollowedByYou: Boolean) -> Unit
+) {
+    val userInfo = fullUserInfo.userInfo
+    Column(modifier = Modifier.padding(top = 8.dp, start = 24.dp, end = 24.dp)) {
+        MainProfileInfo(userInfo)
+        ProfileFollowingsAndFollowersView(
+            fullUserInfo,
+            onFollowersClicked,
+            onFollowingsClicked,
+            Modifier.padding(top = 16.dp)
+        )
+        if (userInfo.isFollowsYou != null && userInfo.isFollowedByYou != null) {
+            FollowButton(userInfo.isFollowsYou, userInfo.isFollowedByYou) {
+                onFollowButtonClicked.invoke(userInfo.isFollowedByYou)
+            }
+        }
 
+        UserDescription(userInfo)
+        UserSocialMediaLinks(userInfo, onLinkClicked)
+
+        UserWatchlist(fullUserInfo)
+        UserPostsTitle(fullUserInfo)
+    }
+}
+
+@Composable
+private fun FollowButton(
+    isFollowsYou: Boolean, isFollowedByYou: Boolean,
+    onFollowButtonClicked: (isFollowedByYou: Boolean) -> Unit
+) {
+    val text = when {
+        isFollowedByYou -> "Отписаться"
+        !isFollowedByYou && isFollowsYou -> "Подписаться в ответ"
+        else -> "Подписаться"
+    }
+
+    Button(
+        onClick = { onFollowButtonClicked.invoke(isFollowedByYou) },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp)
+    ) {
+        Text(text = text, style = MaterialTheme.typography.h6, modifier = Modifier.padding(8.dp))
+    }
 }

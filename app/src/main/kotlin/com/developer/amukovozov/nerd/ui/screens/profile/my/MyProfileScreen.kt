@@ -21,7 +21,7 @@ import com.developer.amukovozov.nerd.model.FullUserInfo
 import com.developer.amukovozov.nerd.model.SocialMediaLink
 import com.developer.amukovozov.nerd.model.UserInfoDetails
 import com.developer.amukovozov.nerd.ui.screens.feed.FeedReviewItem
-import com.developer.amukovozov.nerd.ui.screens.profile.ProfileInformation
+import com.developer.amukovozov.nerd.ui.screens.profile.*
 import com.developer.amukovozov.nerd.ui.screens.profile_list.ProfileListScreen
 import com.developer.amukovozov.nerd.ui.screens.profile_list.ProfileListType
 import com.developer.amukovozov.nerd.ui.theme.primaryColor
@@ -57,11 +57,11 @@ fun MyProfileScreen(
                         fullUserInfo = it,
                         onLogoutButtonClicked = viewModel::onLogoutButtonClicked,
                         onEditButtonClicked = viewModel::onEditButtonClicked,
-                        onFollowersClicked = {
-                            navController.navigate(ProfileListScreen.createDestination(ProfileListType.Followers))
+                        onFollowersClicked = { userId ->
+                            navController.navigate(ProfileListScreen.createDestination(ProfileListType.Followers, userId))
                         },
-                        onFollowingsClicked = {
-                            navController.navigate(ProfileListScreen.createDestination(ProfileListType.Followings))
+                        onFollowingsClicked = { userId ->
+                            navController.navigate(ProfileListScreen.createDestination(ProfileListType.Followings, userId))
                         },
                         onLinkClicked = { link ->
                             openInChromeTab(context, link.link)
@@ -89,15 +89,16 @@ private fun MyProfileInfo(
     fullUserInfo: FullUserInfo,
     onLogoutButtonClicked: () -> Unit,
     onEditButtonClicked: () -> Unit,
-    onFollowersClicked: () -> Unit,
-    onFollowingsClicked: () -> Unit,
+    onFollowersClicked: (userId: Int) -> Unit,
+    onFollowingsClicked: (userId: Int) -> Unit,
     onLinkClicked: (SocialMediaLink) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn {
         item { MyProfileSettingsButtons(onLogoutButtonClicked, onEditButtonClicked) }
+        item {  }
         item {
-            ProfileInformation(
+            MyProfileInformation(
                 fullUserInfo = fullUserInfo,
                 onFollowersClicked = onFollowersClicked,
                 onFollowingsClicked = onFollowingsClicked,
@@ -109,6 +110,31 @@ private fun MyProfileInfo(
                 FeedReviewItem(feed = it, { _, _ -> }, {}, {})
             }
         }
+    }
+}
+
+@Composable
+private fun MyProfileInformation(
+    fullUserInfo: FullUserInfo,
+    onFollowersClicked: (userId: Int) -> Unit,
+    onFollowingsClicked: (userId: Int) -> Unit,
+    onLinkClicked: (SocialMediaLink) -> Unit
+) {
+    val userInfo = fullUserInfo.userInfo
+    Column(modifier = Modifier.padding(top = 8.dp, start = 24.dp, end = 24.dp)) {
+        MainProfileInfo(userInfo)
+        ProfileFollowingsAndFollowersView(
+            fullUserInfo,
+            onFollowersClicked,
+            onFollowingsClicked,
+            Modifier.padding(top = 16.dp)
+        )
+
+        UserDescription(userInfo)
+        UserSocialMediaLinks(userInfo, onLinkClicked)
+
+        UserWatchlist(fullUserInfo)
+        UserPostsTitle(fullUserInfo)
     }
 }
 
@@ -145,7 +171,7 @@ fun MyProfileSettingsButtons(
 fun ProfilePreview() {
     MyProfileInfo(
         FullUserInfo(
-            UserInfoDetails("1", "muk@ku.ru", "kitaec", "description", null, null),
+            UserInfoDetails("1", "muk@ku.ru", "kitaec", "description", null, null, false, false),
             5,
             56,
             emptyList(),

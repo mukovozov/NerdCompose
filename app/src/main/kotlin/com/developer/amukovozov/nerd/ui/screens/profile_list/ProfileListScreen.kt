@@ -35,19 +35,23 @@ enum class ProfileListType {
 }
 
 object ProfileListScreen {
-    fun createDestination(listType: ProfileListType) = "profile_list/${listType.name}"
-    const val Destination = "profile_list/{profile_list_type}"
+    fun createDestination(listType: ProfileListType, userId: Int) =
+        "profile_list/${userId}?$ProfileListTypeArgument=${listType}"
+
+    const val UserIdTypeArgument = "user_id"
     const val ProfileListTypeArgument = "profile_list_type"
+    const val Destination = "profile_list/{$UserIdTypeArgument}?$ProfileListTypeArgument={$ProfileListTypeArgument}"
 }
 
 @Composable
 fun ProfileListScreen(
     viewModel: ProfileListViewModel,
     profileListType: ProfileListType,
+    userId: Int?,
     navController: NavController,
     modifier: Modifier = Modifier
 ) {
-    viewModel.onScreenOpened(profileListType)
+    viewModel.onScreenOpened(userId, profileListType)
     Scaffold(
         modifier = modifier.navigationBarsPadding(),
         topBar = { ProfileListTabBar(navController, profileListType) }
@@ -58,7 +62,8 @@ fun ProfileListScreen(
                     LazyColumn {
                         items(users) {
                             UserInfoItem(userInfo = it) { userId ->
-                                navController.navigate(ProfileScreen.createDestination(userId))
+                                val dest = viewModel.getDestination(userId)
+                                navController.navigate(dest)
                             }
                         }
                     }

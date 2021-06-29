@@ -2,6 +2,7 @@ package com.developer.amukovozov.nerd.use_case
 
 import com.developer.amukovozov.nerd.model.FullUserInfo
 import com.developer.amukovozov.nerd.repository.FeedRepository
+import com.developer.amukovozov.nerd.repository.UserDataRepository
 import com.developer.amukovozov.nerd.repository.UserRepository
 import com.developer.amukovozov.nerd.repository.WatchlistRepository
 import dagger.hilt.android.scopes.ViewModelScoped
@@ -12,7 +13,8 @@ import javax.inject.Inject
 class ProfileUseCase @Inject constructor(
     private val userRepository: UserRepository,
     private val watchlistRepository: WatchlistRepository,
-    private val feedRepository: FeedRepository
+    private val feedRepository: FeedRepository,
+    private val userDataRepository: UserDataRepository
 ) {
 
     companion object {
@@ -52,6 +54,10 @@ class ProfileUseCase @Inject constructor(
                 watchList = watchlist,
                 posts = posts
             )
+        }.doOnSuccess {
+            if (userDataRepository.getMyUserId() == 0) {
+                userDataRepository.saveMyUserId(it.userInfo.id.toInt())
+            }
         }
     }
 }
