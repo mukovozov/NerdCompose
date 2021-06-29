@@ -6,12 +6,21 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class TokenRepository @Inject constructor(
+class UserDataRepository @Inject constructor(
     private val preferences: SharedPreferences
 ) {
     companion object {
         private const val TOKEN = "token"
+        private const val USER_ID = "user_id"
     }
+
+    fun saveMyUserId(userId: Int) {
+        preferences.edit {
+            putInt(USER_ID, userId)
+        }
+    }
+
+    fun getMyUserId() = preferences.getInt(USER_ID, 0)
 
     fun putToken(token: String) {
         preferences.edit {

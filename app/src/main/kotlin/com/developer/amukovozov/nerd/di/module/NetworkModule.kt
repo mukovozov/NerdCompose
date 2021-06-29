@@ -4,7 +4,7 @@ import com.developer.amukovozov.nerd.network.NerdApi
 import com.developer.amukovozov.nerd.network.adapter.FeedTypeAdapter
 import com.developer.amukovozov.nerd.network.adapter.SocialMediaLinkTypeAdapter
 import com.developer.amukovozov.nerd.network.interceptor.TokenInterceptor
-import com.developer.amukovozov.nerd.repository.TokenRepository
+import com.developer.amukovozov.nerd.repository.UserDataRepository
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
@@ -31,12 +31,12 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideOkhttpClient(tokenRepository: TokenRepository): OkHttpClient {
+    fun provideOkhttpClient(userDataRepository: UserDataRepository): OkHttpClient {
         val loggingInterceptor = HttpLoggingInterceptor()
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
 
         return OkHttpClient.Builder()
-            .addInterceptor(TokenInterceptor(tokenRepository))
+            .addInterceptor(TokenInterceptor(userDataRepository))
             .addInterceptor(loggingInterceptor)
             .build()
     }

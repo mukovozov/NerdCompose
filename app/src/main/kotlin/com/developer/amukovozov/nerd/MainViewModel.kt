@@ -6,7 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.net.toUri
 import com.developer.amukovozov.nerd.repository.AuthRepository
-import com.developer.amukovozov.nerd.repository.TokenRepository
+import com.developer.amukovozov.nerd.repository.UserDataRepository
 import com.developer.amukovozov.nerd.util.rx.schedulersIoToMain
 import com.developer.amukovozov.nerd.util.ui.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,7 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    private val tokenRepository: TokenRepository
+    private val userDataRepository: UserDataRepository
 ) : BaseViewModel() {
     companion object {
         private const val APP_DEEPLINK_SCHEME = "nerd"
@@ -40,7 +40,7 @@ class MainViewModel @Inject constructor(
                 .doOnSubscribe { viewState = viewState.copy(appState = AppState.AuthInProgress) }
                 .schedulersIoToMain()
                 .subscribe({
-                    tokenRepository.putToken(it.token)
+                    userDataRepository.putToken(it.token)
                     onAppStarted()
                 }, {
                     Timber.e(it)
@@ -62,7 +62,7 @@ class MainViewModel @Inject constructor(
                 deeplink.host == YANDEX_AUTH_DEEPLINK_HOST
 
     private fun onAppStarted() {
-        val isUserAuthorized = !tokenRepository.getToken().isNullOrBlank()
+        val isUserAuthorized = !userDataRepository.getToken().isNullOrBlank()
         val nextAppState = if (isUserAuthorized) AppState.Home else AppState.Auth
         viewState = viewState.copy(appState = nextAppState)
     }
