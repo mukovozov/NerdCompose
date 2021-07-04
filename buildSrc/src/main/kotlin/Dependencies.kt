@@ -5,7 +5,7 @@ object Versions {
 }
 
 object Libs {
-    const val androidGradlePlugin = "com.android.tools.build:gradle:7.0.0-beta01"
+    const val androidGradlePlugin = "com.android.tools.build:gradle:7.0.0-beta03"
 
     object Accompanist {
         private const val version = "0.8.1"
@@ -28,7 +28,7 @@ object Libs {
     }
 
     object Di {
-        private const val version = "2.33-beta"
+        private const val version = "2.37"
         const val hiltGradlePlugin = "com.google.dagger:hilt-android-gradle-plugin:$version"
         const val hiltAndroid = "com.google.dagger:hilt-android:$version"
         const val hiltKapt = "com.google.dagger:hilt-compiler:$version"
