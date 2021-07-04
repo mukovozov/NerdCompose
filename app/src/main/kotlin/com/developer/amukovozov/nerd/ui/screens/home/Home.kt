@@ -60,14 +60,14 @@ fun Home(
             }
         },
         bottomBar = {
-            val navBackStackEntry by navController.currentBackStackEntryAsState()
-            val currentRoute = navBackStackEntry?.arguments?.getString(KEY_ROUTE) ?: HomeTab.Feed.route
+//            val navBackStackEntry by navController.currentBackStackEntryAsState()
+//            val currentRoute = navBackStackEntry?.arguments?.getString(KEY_ROUTE) ?: HomeTab.Feed.route
 //            if (HomeTab.values().find { it.route == currentRoute } != null) {
-                BottomNavigation {
-                    navItems.forEach { screen ->
-                        val isScreenSelected = screen.route == selectedTab.route
-                        NerdBottomNavigationItem(isScreenSelected, screen, onTabSelected, navController)
-                    }
+            BottomNavigation {
+                navItems.forEach { screen ->
+                    val isScreenSelected = screen.route == selectedTab.route
+                    NerdBottomNavigationItem(isScreenSelected, screen, onTabSelected, navController)
+                }
 //                }
             }
         }
@@ -129,9 +129,9 @@ private fun NavGraphBuilder.profileNestedNavigation(
         arguments = listOf(navArgument(ProfileListScreen.ProfileListTypeArgument) {
             type = NavType.StringType
         },
-        navArgument(ProfileListScreen.UserIdTypeArgument){
-            type = NavType.IntType
-        })
+            navArgument(ProfileListScreen.UserIdTypeArgument) {
+                type = NavType.IntType
+            })
     ) {
         val viewModel = hiltNavGraphViewModel<ProfileListViewModel>()
         val profileListType: ProfileListType = it.arguments?.getString(ProfileListScreen.ProfileListTypeArgument)

@@ -210,7 +210,7 @@ fun FeedReviewItemPreview() {
             UserInfo(1, "mail@info.com", "nickname", "")
         ),
         onReviewClicked = {},
-        onLikeClicked = { id, isLiked -> },
+        onLikeClicked = { _, _ -> },
         onUserClicked = {}
     )
 }

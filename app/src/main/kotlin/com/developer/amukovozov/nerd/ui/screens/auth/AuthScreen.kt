@@ -20,7 +20,6 @@ import com.google.accompanist.insets.navigationBarsPadding
 
 @Composable
 fun AuthScreen(
-    viewModel: AuthViewModel,
     modifier: Modifier = Modifier
 ) {
     Scaffold(

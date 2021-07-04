@@ -91,8 +91,7 @@ private fun MyProfileInfo(
     onEditButtonClicked: () -> Unit,
     onFollowersClicked: (userId: Int) -> Unit,
     onFollowingsClicked: (userId: Int) -> Unit,
-    onLinkClicked: (SocialMediaLink) -> Unit,
-    modifier: Modifier = Modifier
+    onLinkClicked: (SocialMediaLink) -> Unit
 ) {
     LazyColumn {
         item { MyProfileSettingsButtons(onLogoutButtonClicked, onEditButtonClicked) }
