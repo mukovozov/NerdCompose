@@ -1,5 +1,7 @@
-package com.developer.amukovozov.nerd.model
+package com.developer.amukovozov.nerd.model.feed
 
+import com.developer.amukovozov.nerd.model.UserInfo
+import com.developer.amukovozov.nerd.model.movie.Movie
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 

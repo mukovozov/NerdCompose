@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import coil.transform.CircleCropTransformation
 import com.developer.amukovozov.nerd.R
 import com.developer.amukovozov.nerd.model.FullUserInfo
-import com.developer.amukovozov.nerd.model.Movie
+import com.developer.amukovozov.nerd.model.movie.Movie
 import com.developer.amukovozov.nerd.model.SocialMediaLink
 import com.developer.amukovozov.nerd.model.UserInfoDetails
 import com.developer.amukovozov.nerd.ui.theme.primaryColor

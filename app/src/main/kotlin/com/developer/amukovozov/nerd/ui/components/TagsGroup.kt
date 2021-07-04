@@ -18,7 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.emoji.text.EmojiCompat
-import com.developer.amukovozov.nerd.model.Tag
+import com.developer.amukovozov.nerd.model.feed.Tag
 
 private val tagHeight = 32.dp
 private val tagPadding = 8.dp

@@ -21,8 +21,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.compose.navigate
 import com.developer.amukovozov.nerd.model.*
+import com.developer.amukovozov.nerd.model.feed.Feed
+import com.developer.amukovozov.nerd.model.feed.FeedType
+import com.developer.amukovozov.nerd.model.feed.Tag
+import com.developer.amukovozov.nerd.model.movie.Movie
 import com.developer.amukovozov.nerd.ui.components.TagsGroup
+import com.developer.amukovozov.nerd.ui.screens.movie_details.MovieDetailsScreen
 import com.developer.amukovozov.nerd.ui.theme.backgroundAccentColor
 import com.developer.amukovozov.nerd.ui.theme.primaryColor
 import com.developer.amukovozov.nerd.util.ui.Content
@@ -31,6 +37,10 @@ import com.developer.amukovozov.nerd.util.ui.Stub
 import com.developer.amukovozov.nerd.util.ui.rememberTmdbPosterPainter
 import timber.log.Timber
 import java.util.*
+
+object FeedScreen {
+    const val Destination = "feed"
+}
 
 @Composable
 fun Feed(
@@ -53,7 +63,10 @@ fun Feed(
                     FeedList(
                         feeds = it,
                         onLikeClicked = viewModel::onLikeClicked,
-                        onPageEnded = viewModel::onPageEnded
+                        onPageEnded = viewModel::onPageEnded,
+                        onReviewClicked = { movieId ->
+                            navController.navigate(MovieDetailsScreen.createDestination(movieId))
+                        }
                     )
                 }
             }
@@ -69,6 +82,7 @@ fun Feed(
 fun FeedList(
     feeds: List<Feed>,
     onLikeClicked: (FeedId: Int, isLiked: Boolean) -> Unit,
+    onReviewClicked: (movieId: Int) -> Unit,
     onPageEnded: () -> Unit
 ) {
     val listState = rememberLazyListState()
@@ -76,7 +90,9 @@ fun FeedList(
         items(feeds) { feed ->
             FeedReviewItem(feed = feed,
                 onLikeClicked = onLikeClicked,
-                onReviewClicked = {},
+                onReviewClicked = { movieId ->
+                    onReviewClicked.invoke(movieId)
+                },
                 onUserClicked = {}
             )
         }
@@ -97,7 +113,7 @@ fun FeedList(
 fun FeedReviewItem(
     feed: Feed,
     onLikeClicked: (feedId: Int, isLiked: Boolean) -> Unit,
-    onReviewClicked: () -> Unit,
+    onReviewClicked: (movieId: Int) -> Unit,
     onUserClicked: () -> Unit
 ) {
     Card(
@@ -132,10 +148,10 @@ fun FeedReviewItem(
 }
 
 @Composable
-private fun UserReviewBlock(feed: Feed, onReviewClicked: () -> Unit) {
+private fun UserReviewBlock(feed: Feed, onReviewClicked: (movieId: Int) -> Unit) {
     Row(modifier = Modifier
         .fillMaxWidth()
-        .clickable { onReviewClicked.invoke() }) {
+        .clickable { onReviewClicked.invoke(feed.movie.id) }) {
         Image(
             painter = rememberTmdbPosterPainter(feed.movie.posterPath),
             contentDescription = null,

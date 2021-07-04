@@ -1,8 +1,16 @@
 package com.developer.amukovozov.nerd.network
 
-import com.developer.amukovozov.nerd.model.*
+import com.developer.amukovozov.nerd.model.Pagination
+import com.developer.amukovozov.nerd.model.TokenInfo
+import com.developer.amukovozov.nerd.model.UserInfo
+import com.developer.amukovozov.nerd.model.UserInfoDetails
+import com.developer.amukovozov.nerd.model.feed.Feed
+import com.developer.amukovozov.nerd.model.feed.FeedRequest
+import com.developer.amukovozov.nerd.model.movie.Movie
+import com.developer.amukovozov.nerd.model.movie.MovieDetails
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
+import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
@@ -59,4 +67,10 @@ interface NerdApi {
 
     @POST("/feed/like/remove")
     fun removeLike(@Query("feedId") feedId: Int): Completable
+
+    @POST("/feed/create")
+    fun createFeed(@Body feed: FeedRequest): Completable
+
+    @GET("/movie/details")
+    fun getMovieDetails(@Query("id") id: Int): Single<MovieDetails>
 }

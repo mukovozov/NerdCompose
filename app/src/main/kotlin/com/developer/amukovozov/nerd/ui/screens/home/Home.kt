@@ -13,7 +13,6 @@ import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -26,7 +25,10 @@ import androidx.navigation.compose.*
 import com.developer.amukovozov.nerd.R
 import com.developer.amukovozov.nerd.ui.screens.browse.Browse
 import com.developer.amukovozov.nerd.ui.screens.feed.Feed
+import com.developer.amukovozov.nerd.ui.screens.feed.FeedScreen
 import com.developer.amukovozov.nerd.ui.screens.feed.FeedViewModel
+import com.developer.amukovozov.nerd.ui.screens.movie_details.MovieDetailsScreen
+import com.developer.amukovozov.nerd.ui.screens.movie_details.MovieDetailsViewModel
 import com.developer.amukovozov.nerd.ui.screens.profile.another.ProfileScreen
 import com.developer.amukovozov.nerd.ui.screens.profile.another.ProfileViewModel
 import com.developer.amukovozov.nerd.ui.screens.profile.my.MyProfileScreen
@@ -72,10 +74,9 @@ fun Home(
             }
         }
     ) { innerPadding ->
-        NavHost(navController = navController, startDestination = HomeTab.Feed.route) {
-            composable(HomeTab.Feed.route) {
-                val viewModel = hiltNavGraphViewModel<FeedViewModel>()
-                Feed(viewModel, navController, Modifier.padding(innerPadding))
+        NavHost(navController = navController, startDestination = FeedScreen.Destination) {
+            navigation(HomeTab.Feed.route, FeedScreen.Destination) {
+                feedNestedNavigation(navController, innerPadding)
             }
             composable(HomeTab.Search.route) { Browse(navController) }
             navigation(HomeTab.Profile.route, MyProfileScreen.Destination) {
@@ -111,9 +112,33 @@ private fun RowScope.NerdBottomNavigationItem(
 }
 
 enum class HomeTab(val route: String, val inactiveIcon: ImageVector, val activeIcon: ImageVector) {
-    Feed("feed", Icons.Outlined.Home, Icons.Filled.Home),
+    Feed("feed_tab", Icons.Outlined.Home, Icons.Filled.Home),
     Search("search", Icons.Outlined.Search, Icons.Filled.Search),
     Profile("profile", Icons.Outlined.AccountCircle, Icons.Filled.AccountCircle);
+}
+
+private fun NavGraphBuilder.feedNestedNavigation(
+    navController: NavHostController,
+    innerPadding: PaddingValues
+) {
+    composable(HomeTab.Feed.route) {
+        val viewModel = hiltNavGraphViewModel<FeedViewModel>()
+        Feed(viewModel, navController, Modifier.padding(innerPadding))
+    }
+
+    composable(
+        MovieDetailsScreen.Destination,
+        arguments = listOf(
+            navArgument(MovieDetailsScreen.Argument) {
+                type = NavType.IntType
+            }
+        )
+    ) {
+        val viewModel = hiltNavGraphViewModel<MovieDetailsViewModel>()
+        val movieId = it.arguments?.getInt(MovieDetailsScreen.Argument) ?: return@composable
+
+        MovieDetailsScreen(movieId = movieId, viewModel = viewModel)
+    }
 }
 
 private fun NavGraphBuilder.profileNestedNavigation(
@@ -126,9 +151,10 @@ private fun NavGraphBuilder.profileNestedNavigation(
     }
     composable(
         ProfileListScreen.Destination,
-        arguments = listOf(navArgument(ProfileListScreen.ProfileListTypeArgument) {
-            type = NavType.StringType
-        },
+        arguments = listOf(
+            navArgument(ProfileListScreen.ProfileListTypeArgument) {
+                type = NavType.StringType
+            },
             navArgument(ProfileListScreen.UserIdTypeArgument) {
                 type = NavType.IntType
             })
