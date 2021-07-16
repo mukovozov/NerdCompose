@@ -23,10 +23,12 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
 import com.developer.amukovozov.nerd.model.*
+import com.developer.amukovozov.nerd.model.feed.CountableTag
 import com.developer.amukovozov.nerd.model.feed.Feed
 import com.developer.amukovozov.nerd.model.feed.FeedType
 import com.developer.amukovozov.nerd.model.feed.Tag
 import com.developer.amukovozov.nerd.model.movie.Movie
+import com.developer.amukovozov.nerd.ui.components.CountableTagsGroup
 import com.developer.amukovozov.nerd.ui.components.TagsGroup
 import com.developer.amukovozov.nerd.ui.screens.movie_details.MovieDetailsScreen
 import com.developer.amukovozov.nerd.ui.theme.backgroundAccentColor

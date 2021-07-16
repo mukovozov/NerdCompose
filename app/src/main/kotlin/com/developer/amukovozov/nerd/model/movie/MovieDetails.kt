@@ -65,4 +65,12 @@ data class MovieDetails(
     val userReview: Feed?,
     @Json(name = "availability")
     val availability: AvailabilityInfo?
-)
+) {
+    fun getDirector() =
+        crew.find { it.job == "Director" }
+
+    fun getShortInfo() =
+        "$originalTitle (${productionCountries.firstOrNull()?.name ?: ""}, " +
+                "${releaseDate.subSequence(0, 3)
+        })"
+}

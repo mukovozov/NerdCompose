@@ -13,7 +13,7 @@ import com.google.accompanist.imageloading.LoadPainter
 
 private const val TMDB_BASE_URL = "https://image.tmdb.org/t/p"
 private const val POSTER_WIDTH = "w500"
-private const val BACKDROP_PATH = "w1280"
+private const val BACKDROP_PATH = "w500"
 
 @Composable
 fun rememberTmdbPosterPainter(

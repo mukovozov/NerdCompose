@@ -13,6 +13,7 @@ import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -47,12 +48,18 @@ fun Home(
     onTabSelected: (HomeTab) -> Unit
 ) {
     val navItems = HomeTab.values().toList()
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.arguments?.getString(KEY_ROUTE) ?: HomeTab.Feed.route
+
     Scaffold(
         modifier = Modifier
             .background(backgroundColor)
             .navigationBarsPadding(),
         topBar = {
-            if (selectedTab != HomeTab.Profile) {
+            if (selectedTab != HomeTab.Profile &&
+                currentRoute != MovieDetailsScreen.Destination
+            ) {
                 TopAppBar(modifier = Modifier.statusBarsPadding()) {
                     Text(
                         text = stringResource(id = R.string.feed_app_bar_title),
@@ -62,15 +69,14 @@ fun Home(
             }
         },
         bottomBar = {
-//            val navBackStackEntry by navController.currentBackStackEntryAsState()
-//            val currentRoute = navBackStackEntry?.arguments?.getString(KEY_ROUTE) ?: HomeTab.Feed.route
-//            if (HomeTab.values().find { it.route == currentRoute } != null) {
-            BottomNavigation {
-                navItems.forEach { screen ->
-                    val isScreenSelected = screen.route == selectedTab.route
-                    NerdBottomNavigationItem(isScreenSelected, screen, onTabSelected, navController)
+            if (currentRoute != MovieDetailsScreen.Destination) {
+                BottomNavigation {
+                    navItems.forEach { screen ->
+                        val isScreenSelected = screen.route == selectedTab.route
+                        NerdBottomNavigationItem(isScreenSelected, screen, onTabSelected, navController)
+                    }
                 }
-//                }
+
             }
         }
     ) { innerPadding ->
