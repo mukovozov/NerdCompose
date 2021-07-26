@@ -69,8 +69,5 @@ data class MovieDetails(
     fun getDirector() =
         crew.find { it.job == "Director" }
 
-    fun getShortInfo() =
-        "$originalTitle (${productionCountries.firstOrNull()?.name ?: ""}, " +
-                "${releaseDate.subSequence(0, 3)
-        })"
+    fun getShortInfo() = "${releaseDate.subSequence(0, 3)} $runtime)"
 }

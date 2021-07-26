@@ -2,11 +2,13 @@ package com.developer.amukovozov.nerd.ui.screens.movie_details
 
 import android.content.Context
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -16,6 +18,7 @@ import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -30,9 +33,9 @@ import com.developer.amukovozov.nerd.model.feed.CountableTag
 import com.developer.amukovozov.nerd.model.feed.Tag
 import com.developer.amukovozov.nerd.model.movie.Cast
 import com.developer.amukovozov.nerd.model.movie.Genres
+import com.developer.amukovozov.nerd.model.movie.Member
 import com.developer.amukovozov.nerd.model.movie.MovieDetails
 import com.developer.amukovozov.nerd.ui.components.ChipWithCounter
-import com.developer.amukovozov.nerd.ui.screens.feed.FeedList
 import com.developer.amukovozov.nerd.ui.screens.feed.FeedReviewItem
 import com.developer.amukovozov.nerd.ui.theme.backgroundColor
 import com.developer.amukovozov.nerd.ui.theme.primaryTextColor
@@ -42,6 +45,7 @@ import com.developer.amukovozov.nerd.util.ui.getContext
 import com.developer.amukovozov.nerd.util.ui.rememberTmdbBackdropPainter
 import com.developer.amukovozov.nerd.util.ui.rememberTmdbPosterPainter
 import com.google.accompanist.insets.navigationBarsPadding
+import timber.log.Timber
 
 private val MinHeaderOffset = 0.dp
 private val MaxHeaderOffset = 200.dp
@@ -65,12 +69,14 @@ fun MovieDetails(context: Context, details: MovieDetails, innerPadding: PaddingV
         ConstraintLayout(
             modifier = Modifier
                 .fillMaxSize()
-                .then(HzPadding)
                 .verticalScroll(scrollState)
         ) {
             val (backDrop, title, tagline, poster, overview,
                 shortInfo, director, seeMoreButton,
-                tags, friendsFeedTitle, friendsFeed) = createRefs()
+                tags, friendsFeed, cast, crew) = createRefs()
+
+            val startGuideline = createGuidelineFromStart(16.dp)
+            val endGuideline = createGuidelineFromEnd(16.dp)
 
             Box(modifier = Modifier.constrainAs(backDrop) {
                 top.linkTo((parent.top))
@@ -102,16 +108,39 @@ fun MovieDetails(context: Context, details: MovieDetails, innerPadding: PaddingV
                 text = details.title,
                 style = MaterialTheme.typography.h6,
                 color = primaryTextColor,
-                textAlign = TextAlign.Center,
+                textAlign = TextAlign.Start,
                 modifier = Modifier
-                    .offset(y = (-16).dp)
                     .constrainAs(title) {
-                        top.linkTo(backDrop.bottom)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
+                        top.linkTo(backDrop.bottom, margin = 16.dp)
+                        start.linkTo(startGuideline)
+                        end.linkTo(poster.start, margin = 16.dp)
                         width = Dimension.fillToConstraints
                     }
             )
+            Image(
+                painter = rememberTmdbPosterPainter(details.posterPath),
+                modifier = Modifier.constrainAs(poster) {
+                    top.linkTo(backDrop.bottom, margin = 2.dp)
+                    end.linkTo(endGuideline)
+                    height = Dimension.value(150.dp)
+                },
+                contentDescription = null
+            )
+
+            details.getDirector()?.let {
+                Text(
+                    text = "Режиссер\n${it.name}",
+                    color = primaryTextColor,
+                    style = MaterialTheme.typography.subtitle2,
+                    modifier = Modifier.constrainAs(director) {
+                        top.linkTo(shortInfo.bottom, margin = 8.dp)
+                        start.linkTo(startGuideline)
+                        end.linkTo(poster.start, margin = 16.dp)
+                        width = Dimension.fillToConstraints
+                    }
+                )
+            }
+
             Text(
                 text = details.getShortInfo(),
                 style = MaterialTheme.typography.subtitle2,
@@ -120,35 +149,12 @@ fun MovieDetails(context: Context, details: MovieDetails, innerPadding: PaddingV
                 maxLines = 1,
                 modifier = Modifier
                     .constrainAs(shortInfo) {
-                        top.linkTo(title.bottom, margin = 8.dp)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
+                        top.linkTo(director.bottom, margin = 8.dp)
+                        start.linkTo(startGuideline)
+                        end.linkTo(endGuideline)
                         width = Dimension.fillToConstraints
                     }
             )
-            details.getDirector()?.let {
-                Text(
-                    text = "Режиссер:\n ${it.name}",
-                    color = primaryTextColor,
-                    style = MaterialTheme.typography.subtitle2,
-                    modifier = Modifier.constrainAs(director) {
-                        top.linkTo(shortInfo.bottom, margin = 8.dp)
-                        start.linkTo(parent.start)
-                        end.linkTo(poster.start, margin = 16.dp)
-                        width = Dimension.fillToConstraints
-                    }
-                )
-            }
-            Image(
-                painter = rememberTmdbPosterPainter(details.posterPath),
-                modifier = Modifier.constrainAs(poster) {
-                    top.linkTo(shortInfo.bottom, margin = 4.dp)
-                    end.linkTo(parent.end)
-                    height = Dimension.value(150.dp)
-                },
-                contentDescription = null
-            )
-
             var isSeeMoreButtonVisible by remember { mutableStateOf(true) }
             Text(
                 text = details.overview,
@@ -159,8 +165,8 @@ fun MovieDetails(context: Context, details: MovieDetails, innerPadding: PaddingV
                 modifier = Modifier
                     .constrainAs(overview) {
                         top.linkTo(poster.bottom, margin = 16.dp)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
+                        start.linkTo(startGuideline)
+                        end.linkTo(endGuideline)
                         width = Dimension.fillToConstraints
                     }
                     .animateContentSize()
@@ -200,94 +206,197 @@ fun MovieDetails(context: Context, details: MovieDetails, innerPadding: PaddingV
                     }
                 }
             }
-
-            if (!details.friendsReviews.isNullOrEmpty()) {
-                Text(
-                    text = "Ревью друзей",
-                    style = MaterialTheme.typography.subtitle2,
-                    color = primaryTextColor,
-                    modifier = Modifier.constrainAs(friendsFeedTitle) {
-                        top.linkTo(tags.bottom, margin = 16.dp)
-                        start.linkTo(parent.start)
+            Column(modifier = Modifier.constrainAs(friendsFeed) {
+                top.linkTo(tags.bottom, margin = 16.dp)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+                width = Dimension.fillToConstraints
+            }) {
+                if (!details.friendsReviews.isNullOrEmpty()) {
+                    Text(
+                        text = "Ревью друзей",
+                        style = MaterialTheme.typography.subtitle2,
+                        color = primaryTextColor
+                    )
+                    LazyRow(modifier = Modifier.padding(top = 8.dp)) {
+                        items(details.friendsReviews) {
+                            FeedReviewItem(feed = it, onLikeClicked = { _, _ -> }, onReviewClicked = {}) {}
+                        }
                     }
-                )
-                details.friendsReviews.map {
-                    FeedReviewItem(feed = it, onLikeClicked = { _, _ -> }, onReviewClicked = {}) {
+                }
+            }
+
+            Column(modifier = Modifier.constrainAs(cast) {
+                top.linkTo(friendsFeed.bottom, margin = 16.dp)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+                width = Dimension.fillToConstraints
+            }) {
+                if (!details.cast.isNullOrEmpty()) {
+                    Text(
+                        text = "Актеры",
+                        style = MaterialTheme.typography.subtitle2,
+                        color = primaryTextColor
+                    )
+                    LazyRow {
+                        items(details.cast) {
+                            MemberItem(it)
+                        }
+                    }
+                }
+            }
+
+            Column(modifier = Modifier.constrainAs(crew) {
+                top.linkTo(cast.bottom, margin = 8.dp)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+                width = Dimension.fillToConstraints
+            }) {
+                if (!details.crew.isNullOrEmpty()) {
+                    Text(
+                        text = "Съемочная группа",
+                        style = MaterialTheme.typography.subtitle2,
+                        color = primaryTextColor,
+                    )
+                    LazyRow {
+                        items(details.crew) {
+                            Timber.d(it.role)
+                            MemberItem(it)
+                        }
                     }
                 }
             }
         }
     }
+}
 
-    @Composable
-    fun ActivitiesBottomBar(details: MovieDetails) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
+@Composable
+fun MemberItem(member: Member) {
+    Column(
+        modifier = Modifier
+            .padding(8.dp)
+            .width(100.dp)
+            .heightIn(max = 200.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Image(
+            painter = rememberTmdbPosterPainter(member.profilePath), contentDescription = null,
             modifier = Modifier
-                .navigationBarsPadding()
-                .then(HzPadding)
-                .heightIn(BottomBarHeight)
-        ) {
-
-        }
-    }
-
-    @Preview
-    @Composable
-    fun PreviewMovieDetailsClear() {
-        MovieDetails(
-            context = getContext(),
-            innerPadding = PaddingValues(),
-            details = MovieDetails(
-                515087,
-                "/flPdWe3qZPZfPUGIr2PKodeqIwz.jpg",
-                null,
-                listOf(Genres(18, "драма")),
-                "tt6458566",
-                "en",
-                "Esau",
-                "Эсав, по одноименному роману израильского автора Меира Шалева, следует за 40-летним писателем, который спустя полжизни возвращается в дом своей семьи, чтобы встретиться с братом, укравшим его любовь и средства к существованию. Эта история — современная интерпретация библейской истории Иакова и Исава из «Книги Бытия».",
-                0,
-                "/1hr94FDYyXzqGpfU3leAFbUkxm0.jpg",
-                listOf(),
-                "2019-11-04",
-                114,
-                "Released",
-                "tagline",
-                "Эсав",
-                false,
-                emptyList(),
-                listOf(
-                    Cast(
-                        false,
-                        2,
-                        164,
-                        "Acting",
-                        "Lior Ashkenazi",
-                        "Lior Ashkenazi",
-                        1.62,
-                        "/c2IJJuYiqZNHoZVikp6HgCgbGkK.jpg",
-                        12,
-                        "Esau",
-                        "5abdeb890e0a264a5d008a54",
-                        0
-                    )
-                ),
-                listOf(),
-                listOf(),
-                listOf(),
-                listOf(
-                    CountableTag(Tag(1, "perviy", null, "33C22D3D", "FFC22D3D"), count = 1),
-                    CountableTag(Tag(2, "vtoroy", null, "3373BFEE", "FF73BFEE"), count = 12),
-                    CountableTag(Tag(3, "tretiy", null, "33EECAA4", "FFEECAA4"), count = 3)
-                ),
-                false,
-                false,
-                listOf(),
-                listOf(),
-                null,
-                null
-            )
+                .size(100.dp)
+                .clip(CircleShape)
+        )
+        Text(
+            member.name,
+            modifier = Modifier.padding(top = 4.dp),
+            style = MaterialTheme.typography.caption,
+            color = primaryTextColor,
+            textAlign = TextAlign.Center
+        )
+        Text(
+            member.role,
+            modifier = Modifier.padding(top = 2.dp),
+            style = MaterialTheme.typography.caption,
+            color = secondaryTextColor,
+            textAlign = TextAlign.Center
         )
     }
+}
+
+@Composable
+fun Backdrop(backdropPath: String) {
+    Box {
+        Image(
+            painter = rememberTmdbBackdropPainter(backdropPath),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(MaxHeaderOffset),
+            contentScale = ContentScale.FillWidth,
+            contentDescription = null
+        )
+        val gradientStartY = with(LocalDensity.current) { MaxTitleOffset.toPx() } / 2
+        Spacer(
+            Modifier
+                .height(MaxHeaderOffset)
+                .fillMaxWidth()
+                .background(
+                    Brush.verticalGradient(
+                        listOf(Color.Transparent, backgroundColor),
+                        gradientStartY
+                    ),
+                )
+        )
+    }
+}
+
+@Composable
+fun ActivitiesBottomBar(details: MovieDetails) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .navigationBarsPadding()
+            .then(HzPadding)
+            .heightIn(BottomBarHeight)
+    ) {
+
+    }
+}
+
+@ExperimentalAnimationApi
+@Preview
+@Composable
+fun PreviewMovieDetailsClear() {
+    MovieDetails(
+        context = getContext(),
+        innerPadding = PaddingValues(),
+        details = MovieDetails(
+            515087,
+            "/flPdWe3qZPZfPUGIr2PKodeqIwz.jpg",
+            null,
+            listOf(Genres(18, "драма")),
+            "tt6458566",
+            "en",
+            "Esau",
+            "Эсав, по одноименному роману израильского автора Меира Шалева, следует за 40-летним писателем, который спустя полжизни возвращается в дом своей семьи, чтобы встретиться с братом, укравшим его любовь и средства к существованию. Эта история — современная интерпретация библейской истории Иакова и Исава из «Книги Бытия».",
+            0,
+            "/1hr94FDYyXzqGpfU3leAFbUkxm0.jpg",
+            listOf(),
+            "2019-11-04",
+            114,
+            "Released",
+            "tagline",
+            "Эсав",
+            false,
+            emptyList(),
+            listOf(
+                Cast(
+                    false,
+                    2,
+                    164,
+                    "Acting",
+                    "Lior Ashkenazi",
+                    "Lior Ashkenazi",
+                    1.62,
+                    "/c2IJJuYiqZNHoZVikp6HgCgbGkK.jpg",
+                    12,
+                    "Esau",
+                    "5abdeb890e0a264a5d008a54",
+                    0
+                )
+            ),
+            listOf(),
+            listOf(),
+            listOf(),
+            listOf(
+                CountableTag(Tag(1, "perviy", null, "33C22D3D", "FFC22D3D"), count = 1),
+                CountableTag(Tag(2, "vtoroy", null, "3373BFEE", "FF73BFEE"), count = 12),
+                CountableTag(Tag(3, "tretiy", null, "33EECAA4", "FFEECAA4"), count = 3)
+            ),
+            false,
+            false,
+            listOf(),
+            listOf(),
+            null,
+            null
+        )
+    )
 }
