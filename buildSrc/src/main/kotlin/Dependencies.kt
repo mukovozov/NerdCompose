@@ -31,7 +31,7 @@ object Libs {
         private const val version = "2.38.1"
         const val hiltGradlePlugin = "com.google.dagger:hilt-android-gradle-plugin:2.28-alpha"
         const val hiltAndroid = "com.google.dagger:hilt-android:$version"
-        const val hiltKapt = "com.google.dagger:hilt-android-compiler:2.38.1"
+        const val hiltKapt = "com.google.dagger:hilt-android-compiler:$version"
     }
 
     object Network {
