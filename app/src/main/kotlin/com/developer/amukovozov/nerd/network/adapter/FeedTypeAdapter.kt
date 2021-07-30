@@ -1,6 +1,6 @@
 package com.developer.amukovozov.nerd.network.adapter
 
-import com.developer.amukovozov.nerd.model.FeedType
+import com.developer.amukovozov.nerd.model.feed.FeedType
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.ToJson
 

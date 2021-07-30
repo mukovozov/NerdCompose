@@ -3,7 +3,7 @@ package com.developer.amukovozov.nerd.ui.screens.feed
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.developer.amukovozov.nerd.model.Feed
+import com.developer.amukovozov.nerd.model.feed.Feed
 import com.developer.amukovozov.nerd.network.pagination.Paginator
 import com.developer.amukovozov.nerd.repository.FeedRepository
 import com.developer.amukovozov.nerd.repository.LikeRepository

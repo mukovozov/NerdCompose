@@ -13,7 +13,8 @@ import com.google.accompanist.imageloading.LoadPainter
 
 private const val TMDB_BASE_URL = "https://image.tmdb.org/t/p"
 private const val POSTER_WIDTH = "w500"
-private const val BACKDROP_PATH = "w1280"
+private const val PROFILE_WIDTH = "w100"
+private const val BACKDROP_PATH = "w500"
 
 @Composable
 fun rememberTmdbPosterPainter(
@@ -22,6 +23,15 @@ fun rememberTmdbPosterPainter(
     requestBuilder: (ImageRequest.Builder.(size: IntSize) -> ImageRequest.Builder)? = null
 ): LoadPainter<Any> {
     return rememberTmdbCoilPainter(POSTER_WIDTH, posterPath, previewPlaceHolder, requestBuilder)
+}
+
+@Composable
+fun rememberTmdbProfilePainter(
+    profilePath: String?,
+    @DrawableRes previewPlaceHolder: Int = R.drawable.ic_launcher_foreground,
+    requestBuilder: (ImageRequest.Builder.(size: IntSize) -> ImageRequest.Builder)? = null
+): LoadPainter<Any> {
+    return rememberTmdbCoilPainter(POSTER_WIDTH, profilePath, previewPlaceHolder, requestBuilder)
 }
 
 @Composable

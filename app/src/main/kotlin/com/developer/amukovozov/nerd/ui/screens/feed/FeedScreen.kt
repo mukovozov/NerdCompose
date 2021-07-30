@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -18,19 +19,31 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.developer.amukovozov.nerd.model.*
+import androidx.navigation.compose.navigate
+import com.developer.amukovozov.nerd.model.UserInfo
+import com.developer.amukovozov.nerd.model.feed.Feed
+import com.developer.amukovozov.nerd.model.feed.FeedType
+import com.developer.amukovozov.nerd.model.feed.Tag
+import com.developer.amukovozov.nerd.model.movie.Movie
 import com.developer.amukovozov.nerd.ui.components.TagsGroup
+import com.developer.amukovozov.nerd.ui.screens.movie_details.MovieDetailsScreen
 import com.developer.amukovozov.nerd.ui.theme.backgroundAccentColor
 import com.developer.amukovozov.nerd.ui.theme.primaryColor
 import com.developer.amukovozov.nerd.util.ui.Content
 import com.developer.amukovozov.nerd.util.ui.Loading
 import com.developer.amukovozov.nerd.util.ui.Stub
 import com.developer.amukovozov.nerd.util.ui.rememberTmdbPosterPainter
+import com.google.accompanist.coil.rememberCoilPainter
 import timber.log.Timber
 import java.util.*
+
+object FeedScreen {
+    const val Destination = "feed"
+}
 
 @Composable
 fun Feed(
@@ -53,7 +66,10 @@ fun Feed(
                     FeedList(
                         feeds = it,
                         onLikeClicked = viewModel::onLikeClicked,
-                        onPageEnded = viewModel::onPageEnded
+                        onPageEnded = viewModel::onPageEnded,
+                        onReviewClicked = { movieId ->
+                            navController.navigate(MovieDetailsScreen.createDestination(movieId))
+                        }
                     )
                 }
             }
@@ -69,14 +85,18 @@ fun Feed(
 fun FeedList(
     feeds: List<Feed>,
     onLikeClicked: (FeedId: Int, isLiked: Boolean) -> Unit,
+    onReviewClicked: (movieId: Int) -> Unit,
     onPageEnded: () -> Unit
 ) {
     val listState = rememberLazyListState()
     LazyColumn(state = listState) {
         items(feeds) { feed ->
-            FeedReviewItem(feed = feed,
+            FeedReviewItem(
+                feed = feed,
                 onLikeClicked = onLikeClicked,
-                onReviewClicked = {},
+                onReviewClicked = { movieId ->
+                    onReviewClicked.invoke(movieId)
+                },
                 onUserClicked = {}
             )
         }
@@ -97,7 +117,7 @@ fun FeedList(
 fun FeedReviewItem(
     feed: Feed,
     onLikeClicked: (feedId: Int, isLiked: Boolean) -> Unit,
-    onReviewClicked: () -> Unit,
+    onReviewClicked: (movieId: Int) -> Unit,
     onUserClicked: () -> Unit
 ) {
     Card(
@@ -132,10 +152,51 @@ fun FeedReviewItem(
 }
 
 @Composable
-private fun UserReviewBlock(feed: Feed, onReviewClicked: () -> Unit) {
+fun ShortFeedReviewItem(feed: Feed, modifier: Modifier = Modifier) {
+    Card(
+        shape = RoundedCornerShape(12.dp),
+        backgroundColor = backgroundAccentColor,
+        elevation = 8.dp,
+        modifier = modifier
+    )
+    {
+        Column(modifier = Modifier.padding(8.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.heightIn(min = 64.dp)) {
+                Image(
+                    painter = rememberCoilPainter(feed.userInfo.avatarPath),
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(CircleShape),
+                    contentDescription = null
+                )
+                Column(Modifier.padding(start = 8.dp)) {
+                    Text(
+                        text = feed.userInfo.nickname,
+                        style = MaterialTheme.typography.subtitle2,
+                        maxLines = 1,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+            Text(
+                text = feed.userReview,
+                style = MaterialTheme.typography.body1,
+                modifier = Modifier
+                    .padding(top = 8.dp)
+                    .fillMaxWidth()
+            )
+
+        }
+    }
+}
+
+@Composable
+private fun UserReviewBlock(feed: Feed, onReviewClicked: (movieId: Int) -> Unit) {
     Row(modifier = Modifier
         .fillMaxWidth()
-        .clickable { onReviewClicked.invoke() }) {
+        .clickable { onReviewClicked.invoke(feed.movie.id) }) {
         Image(
             painter = rememberTmdbPosterPainter(feed.movie.posterPath),
             contentDescription = null,
@@ -210,7 +271,7 @@ fun FeedReviewItemPreview() {
             UserInfo(1, "mail@info.com", "nickname", "")
         ),
         onReviewClicked = {},
-        onLikeClicked = { id, isLiked -> },
+        onLikeClicked = { _, _ -> },
         onUserClicked = {}
     )
 }

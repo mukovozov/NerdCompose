@@ -1,4 +1,4 @@
-package com.developer.amukovozov.nerd.model
+package com.developer.amukovozov.nerd.model.feed
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass

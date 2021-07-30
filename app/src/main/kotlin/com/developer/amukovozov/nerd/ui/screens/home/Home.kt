@@ -26,7 +26,10 @@ import androidx.navigation.compose.*
 import com.developer.amukovozov.nerd.R
 import com.developer.amukovozov.nerd.ui.screens.browse.Browse
 import com.developer.amukovozov.nerd.ui.screens.feed.Feed
+import com.developer.amukovozov.nerd.ui.screens.feed.FeedScreen
 import com.developer.amukovozov.nerd.ui.screens.feed.FeedViewModel
+import com.developer.amukovozov.nerd.ui.screens.movie_details.MovieDetailsScreen
+import com.developer.amukovozov.nerd.ui.screens.movie_details.MovieDetailsViewModel
 import com.developer.amukovozov.nerd.ui.screens.profile.another.ProfileScreen
 import com.developer.amukovozov.nerd.ui.screens.profile.another.ProfileViewModel
 import com.developer.amukovozov.nerd.ui.screens.profile.my.MyProfileScreen
@@ -45,12 +48,18 @@ fun Home(
     onTabSelected: (HomeTab) -> Unit
 ) {
     val navItems = HomeTab.values().toList()
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.arguments?.getString(KEY_ROUTE) ?: HomeTab.Feed.route
+
     Scaffold(
         modifier = Modifier
             .background(backgroundColor)
             .navigationBarsPadding(),
         topBar = {
-            if (selectedTab != HomeTab.Profile) {
+            if (selectedTab != HomeTab.Profile &&
+                currentRoute != MovieDetailsScreen.Destination
+            ) {
                 TopAppBar(modifier = Modifier.statusBarsPadding()) {
                     Text(
                         text = stringResource(id = R.string.feed_app_bar_title),
@@ -60,22 +69,20 @@ fun Home(
             }
         },
         bottomBar = {
-            val navBackStackEntry by navController.currentBackStackEntryAsState()
-            val currentRoute = navBackStackEntry?.arguments?.getString(KEY_ROUTE) ?: HomeTab.Feed.route
-//            if (HomeTab.values().find { it.route == currentRoute } != null) {
+            if (currentRoute != MovieDetailsScreen.Destination) {
                 BottomNavigation {
                     navItems.forEach { screen ->
                         val isScreenSelected = screen.route == selectedTab.route
                         NerdBottomNavigationItem(isScreenSelected, screen, onTabSelected, navController)
                     }
-//                }
+                }
+
             }
         }
     ) { innerPadding ->
-        NavHost(navController = navController, startDestination = HomeTab.Feed.route) {
-            composable(HomeTab.Feed.route) {
-                val viewModel = hiltNavGraphViewModel<FeedViewModel>()
-                Feed(viewModel, navController, Modifier.padding(innerPadding))
+        NavHost(navController = navController, startDestination = FeedScreen.Destination) {
+            navigation(HomeTab.Feed.route, FeedScreen.Destination) {
+                feedNestedNavigation(navController, innerPadding)
             }
             composable(HomeTab.Search.route) { Browse(navController) }
             navigation(HomeTab.Profile.route, MyProfileScreen.Destination) {
@@ -111,9 +118,33 @@ private fun RowScope.NerdBottomNavigationItem(
 }
 
 enum class HomeTab(val route: String, val inactiveIcon: ImageVector, val activeIcon: ImageVector) {
-    Feed("feed", Icons.Outlined.Home, Icons.Filled.Home),
+    Feed("feed_tab", Icons.Outlined.Home, Icons.Filled.Home),
     Search("search", Icons.Outlined.Search, Icons.Filled.Search),
     Profile("profile", Icons.Outlined.AccountCircle, Icons.Filled.AccountCircle);
+}
+
+private fun NavGraphBuilder.feedNestedNavigation(
+    navController: NavHostController,
+    innerPadding: PaddingValues
+) {
+    composable(HomeTab.Feed.route) {
+        val viewModel = hiltNavGraphViewModel<FeedViewModel>()
+        Feed(viewModel, navController, Modifier.padding(innerPadding))
+    }
+
+    composable(
+        MovieDetailsScreen.Destination,
+        arguments = listOf(
+            navArgument(MovieDetailsScreen.Argument) {
+                type = NavType.IntType
+            }
+        )
+    ) {
+        val viewModel = hiltNavGraphViewModel<MovieDetailsViewModel>()
+        val movieId = it.arguments?.getInt(MovieDetailsScreen.Argument) ?: return@composable
+
+        MovieDetailsScreen(movieId = movieId, viewModel = viewModel)
+    }
 }
 
 private fun NavGraphBuilder.profileNestedNavigation(
@@ -126,12 +157,13 @@ private fun NavGraphBuilder.profileNestedNavigation(
     }
     composable(
         ProfileListScreen.Destination,
-        arguments = listOf(navArgument(ProfileListScreen.ProfileListTypeArgument) {
-            type = NavType.StringType
-        },
-        navArgument(ProfileListScreen.UserIdTypeArgument){
-            type = NavType.IntType
-        })
+        arguments = listOf(
+            navArgument(ProfileListScreen.ProfileListTypeArgument) {
+                type = NavType.StringType
+            },
+            navArgument(ProfileListScreen.UserIdTypeArgument) {
+                type = NavType.IntType
+            })
     ) {
         val viewModel = hiltNavGraphViewModel<ProfileListViewModel>()
         val profileListType: ProfileListType = it.arguments?.getString(ProfileListScreen.ProfileListTypeArgument)

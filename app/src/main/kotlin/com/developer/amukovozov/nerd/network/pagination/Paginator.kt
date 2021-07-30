@@ -45,12 +45,12 @@ object Paginator {
                 when (state) {
                     is State.Empty -> State.EmptyProgress
                     is State.EmptyError -> State.EmptyProgress
-                    is State.Data<*> -> State.Refresh(state.pageCount, state.data as List<T>)
+                    is State.Data<*> -> State.Refresh(state.pageCount, state.data as List<*>)
                     is State.NewPageProgress<*> -> State.Refresh(
                         state.pageCount,
-                        state.data as List<T>
+                        state.data as List<*>
                     )
-                    is State.FullData<*> -> State.Refresh(state.pageCount, state.data as List<T>)
+                    is State.FullData<*> -> State.Refresh(state.pageCount, state.data as List<*>)
                     else -> state
                 }
             }
@@ -70,13 +70,13 @@ object Paginator {
                 when (state) {
                     is State.Data<*> -> {
                         sideEffectListener(SideEffect.LoadPage(state.pageCount + 1))
-                        State.NewPageProgress(state.pageCount, state.data as List<T>)
+                        State.NewPageProgress(state.pageCount, state.data as List<*>)
                     }
                     else -> state
                 }
             }
             is Action.NewPage<*> -> {
-                val items = action.items as List<T>
+                val items = action.items as List<*>
                 when (state) {
                     is State.EmptyProgress -> {
                         if (items.isEmpty()) {
@@ -94,9 +94,9 @@ object Paginator {
                     }
                     is State.NewPageProgress<*> -> {
                         if (items.isEmpty()) {
-                            State.FullData(state.pageCount, state.data as List<T>)
+                            State.FullData(state.pageCount, state.data as List<*>)
                         } else {
-                            State.Data(state.pageCount + 1, state.data as List<T> + items)
+                            State.Data(state.pageCount + 1, state.data as List<*> + items)
                         }
                     }
                     else -> state
@@ -107,11 +107,11 @@ object Paginator {
                     is State.EmptyProgress -> State.EmptyError(action.error)
                     is State.Refresh<*> -> {
                         sideEffectListener(Paginator.SideEffect.ErrorEvent(action.error))
-                        State.Data(state.pageCount, state.data as List<T>)
+                        State.Data(state.pageCount, state.data as List<*>)
                     }
                     is State.NewPageProgress<*> -> {
                         sideEffectListener(Paginator.SideEffect.ErrorEvent(action.error))
-                        State.Data(state.pageCount, state.data as List<T>)
+                        State.Data(state.pageCount, state.data as List<*>)
                     }
                     else -> state
                 }
