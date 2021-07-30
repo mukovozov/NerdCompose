@@ -16,11 +16,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.navigate
 import coil.transform.CircleCropTransformation
 import com.developer.amukovozov.nerd.R
 import com.developer.amukovozov.nerd.model.UserInfo
-import com.developer.amukovozov.nerd.ui.screens.profile.another.ProfileScreen
 import com.developer.amukovozov.nerd.ui.theme.backgroundAccentColor
 import com.developer.amukovozov.nerd.ui.theme.primaryColor
 import com.developer.amukovozov.nerd.util.ui.Content

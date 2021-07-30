@@ -19,9 +19,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltNavGraphViewModel
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavHostController
-import androidx.navigation.NavType
+import androidx.navigation.*
 import androidx.navigation.compose.*
 import com.developer.amukovozov.nerd.R
 import com.developer.amukovozov.nerd.ui.screens.browse.Browse
@@ -50,7 +48,7 @@ fun Home(
     val navItems = HomeTab.values().toList()
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.arguments?.getString(KEY_ROUTE) ?: HomeTab.Feed.route
+    val currentRoute = navBackStackEntry?.destination?.route ?: HomeTab.Feed.route
 
     Scaffold(
         modifier = Modifier
@@ -110,7 +108,7 @@ private fun RowScope.NerdBottomNavigationItem(
             onTabSelected.invoke(screen)
 
             navController.navigate(screen.route) {
-                popUpTo = navController.graph.startDestination
+                popUpTo(navController.graph.startDestinationId)
                 launchSingleTop = true
             }
         }

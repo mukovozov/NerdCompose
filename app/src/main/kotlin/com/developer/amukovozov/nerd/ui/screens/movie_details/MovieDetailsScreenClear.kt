@@ -47,6 +47,7 @@ import com.developer.amukovozov.nerd.ui.theme.*
 import com.developer.amukovozov.nerd.util.ui.getContext
 import com.developer.amukovozov.nerd.util.ui.rememberTmdbBackdropPainter
 import com.developer.amukovozov.nerd.util.ui.rememberTmdbPosterPainter
+import com.google.accompanist.insets.systemBarsPadding
 
 private val MinHeaderOffset = 0.dp
 private val MaxHeaderOffset = 200.dp
@@ -65,6 +66,7 @@ fun MovieDetails(details: MovieDetails) {
     Box(
         Modifier
             .fillMaxWidth()
+            .systemBarsPadding()
             .padding(bottom = 64.dp)
     ) {
         LazyColumn() {

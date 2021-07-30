@@ -5,16 +5,16 @@ object Versions {
 }
 
 object Libs {
-    const val androidGradlePlugin = "com.android.tools.build:gradle:7.0.0-beta03"
+    const val androidGradlePlugin = "com.android.tools.build:gradle:7.0.0"
 
     object Accompanist {
-        private const val version = "0.8.1"
+        private const val version = "0.15.0"
         const val coil = "com.google.accompanist:accompanist-coil:$version"
         const val insets = "com.google.accompanist:accompanist-insets:$version"
     }
 
     object Kotlin {
-        private const val version = "1.4.32"
+        private const val version = "1.5.10"
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$version"
         const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
         const val extensions = "org.jetbrains.kotlin:kotlin-android-extensions:$version"
@@ -28,10 +28,10 @@ object Libs {
     }
 
     object Di {
-        private const val version = "2.37"
-        const val hiltGradlePlugin = "com.google.dagger:hilt-android-gradle-plugin:$version"
+        private const val version = "2.38.1"
+        const val hiltGradlePlugin = "com.google.dagger:hilt-android-gradle-plugin:2.28-alpha"
         const val hiltAndroid = "com.google.dagger:hilt-android:$version"
-        const val hiltKapt = "com.google.dagger:hilt-compiler:$version"
+        const val hiltKapt = "com.google.dagger:hilt-android-compiler:2.38.1"
     }
 
     object Network {
@@ -43,7 +43,7 @@ object Libs {
         }
 
         object Moshi {
-            private const val version = "1.11.0"
+            private const val version = "1.12.0"
             const val core = "com.squareup.moshi:moshi-kotlin:$version"
             const val codegen = "com.squareup.moshi:moshi-kotlin-codegen:$version"
 
@@ -54,13 +54,13 @@ object Libs {
     }
 
     object AndroidX {
-        const val coreKtx = "androidx.core:core-ktx:1.5.0-beta01"
+        const val coreKtx = "androidx.core:core-ktx:1.6.0"
         const val appCompat = "androidx.appcompat:appcompat:1.2.0"
         const val browser = "androidx.browser:browser:1.3.0"
 
         object Compose {
             const val snapshot = ""
-            const val version = "1.0.0-beta05"
+            const val version = "1.0.0"
 
             const val foundation = "androidx.compose.foundation:foundation:${version}"
             const val layout = "androidx.compose.foundation:foundation-layout:${version}"
@@ -71,18 +71,18 @@ object Libs {
             const val animation = "androidx.compose.animation:animation:${version}"
             const val tooling = "androidx.compose.ui:ui-tooling:${version}"
             const val iconsExtended = "androidx.compose.material:material-icons-extended:$version"
-            const val navigation = "androidx.navigation:navigation-compose:1.0.0-alpha10"
-            const val hiltNavigation = "androidx.hilt:hilt-navigation-compose:1.0.0-alpha01"
-            const val constraintLayout = "androidx.constraintlayout:constraintlayout-compose:1.0.0-alpha06"
+            const val navigation = "androidx.navigation:navigation-compose:2.4.0-alpha05"
+            const val hiltNavigation = "androidx.hilt:hilt-navigation-compose:1.0.0-alpha03"
+            const val constraintLayout = "androidx.constraintlayout:constraintlayout-compose:1.0.0-beta01"
         }
 
         object Activity {
-            const val activityCompose = "androidx.activity:activity-compose:1.3.0-alpha07"
+            const val activityCompose = "androidx.activity:activity-compose:1.3.0"
         }
 
         object Lifecycle {
             const val viewModelCompose =
-                "androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha04"
+                "androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07"
         }
 
         object Emoji {
