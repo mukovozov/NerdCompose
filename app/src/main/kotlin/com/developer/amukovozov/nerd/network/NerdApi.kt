@@ -50,6 +50,12 @@ interface NerdApi {
     @GET("/watchlist")
     fun getMyWatchlist(@Query("page") page: Int): Single<Pagination<Movie>>
 
+    @POST("/watchlist/add")
+    fun addToWatchlist(@Query("id") movieId: Int): Completable
+
+    @POST("/watchlist/delete")
+    fun deleteFromWatchlist(@Query("id") movieId: Int): Completable
+
     @GET("/watchlist")
     fun getUserWatchlist(@Query("page") page: Int, @Query("userId") userId: Int): Single<Pagination<Movie>>
 

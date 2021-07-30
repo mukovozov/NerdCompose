@@ -1,51 +1,52 @@
 package com.developer.amukovozov.nerd.ui.screens.movie_details
 
 import android.content.Context
-import androidx.compose.animation.Crossfade
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.*
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.ArrowDropUp
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkBorder
+import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.Dimension
+import com.developer.amukovozov.nerd.R
 import com.developer.amukovozov.nerd.model.feed.CountableTag
+import com.developer.amukovozov.nerd.model.feed.Feed
 import com.developer.amukovozov.nerd.model.feed.Tag
-import com.developer.amukovozov.nerd.model.movie.Cast
-import com.developer.amukovozov.nerd.model.movie.Genres
-import com.developer.amukovozov.nerd.model.movie.Member
-import com.developer.amukovozov.nerd.model.movie.MovieDetails
-import com.developer.amukovozov.nerd.ui.components.ChipWithCounter
-import com.developer.amukovozov.nerd.ui.screens.feed.FeedReviewItem
-import com.developer.amukovozov.nerd.ui.theme.backgroundColor
-import com.developer.amukovozov.nerd.ui.theme.primaryTextColor
-import com.developer.amukovozov.nerd.ui.theme.secondaryTextColor
-import com.developer.amukovozov.nerd.ui.theme.white
+import com.developer.amukovozov.nerd.model.movie.*
+import com.developer.amukovozov.nerd.ui.components.CountableTagsGroup
+import com.developer.amukovozov.nerd.ui.screens.feed.ShortFeedReviewItem
+import com.developer.amukovozov.nerd.ui.theme.*
 import com.developer.amukovozov.nerd.util.ui.getContext
 import com.developer.amukovozov.nerd.util.ui.rememberTmdbBackdropPainter
 import com.developer.amukovozov.nerd.util.ui.rememberTmdbPosterPainter
-import com.google.accompanist.insets.navigationBarsPadding
-import timber.log.Timber
 
 private val MinHeaderOffset = 0.dp
 private val MaxHeaderOffset = 200.dp
@@ -59,212 +60,20 @@ private val BottomBarHeight = 56.dp
 private val HzPadding = Modifier.padding(horizontal = 24.dp)
 
 @Composable
-fun MovieDetails(context: Context, details: MovieDetails, innerPadding: PaddingValues) {
+fun MovieDetails(details: MovieDetails) {
     val scrollState = rememberScrollState(0)
     Box(
         Modifier
             .fillMaxWidth()
-            .padding(innerPadding)
+            .padding(bottom = 64.dp)
     ) {
-        ConstraintLayout(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(scrollState)
-        ) {
-            val (backDrop, title, tagline, poster, overview,
-                shortInfo, director, seeMoreButton,
-                tags, friendsFeed, cast, crew) = createRefs()
-
-            val startGuideline = createGuidelineFromStart(16.dp)
-            val endGuideline = createGuidelineFromEnd(16.dp)
-
-            Box(modifier = Modifier.constrainAs(backDrop) {
-                top.linkTo((parent.top))
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-            }) {
-                Image(
-                    painter = rememberTmdbBackdropPainter(details.backdropPath),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(MaxHeaderOffset),
-                    contentScale = ContentScale.FillWidth,
-                    contentDescription = null
-                )
-                val gradientStartY = with(LocalDensity.current) { MaxTitleOffset.toPx() } / 2
-                Spacer(
-                    Modifier
-                        .height(MaxHeaderOffset)
-                        .fillMaxWidth()
-                        .background(
-                            Brush.verticalGradient(
-                                listOf(Color.Transparent, backgroundColor),
-                                gradientStartY
-                            ),
-                        )
-                )
-            }
-            Text(
-                text = details.title,
-                style = MaterialTheme.typography.h6,
-                color = primaryTextColor,
-                textAlign = TextAlign.Start,
-                modifier = Modifier
-                    .constrainAs(title) {
-                        top.linkTo(backDrop.bottom, margin = 16.dp)
-                        start.linkTo(startGuideline)
-                        end.linkTo(poster.start, margin = 16.dp)
-                        width = Dimension.fillToConstraints
-                    }
-            )
-            Image(
-                painter = rememberTmdbPosterPainter(details.posterPath),
-                modifier = Modifier.constrainAs(poster) {
-                    top.linkTo(backDrop.bottom, margin = 2.dp)
-                    end.linkTo(endGuideline)
-                    height = Dimension.value(150.dp)
-                },
-                contentDescription = null
-            )
-
-            details.getDirector()?.let {
-                Text(
-                    text = "Режиссер\n${it.name}",
-                    color = primaryTextColor,
-                    style = MaterialTheme.typography.subtitle2,
-                    modifier = Modifier.constrainAs(director) {
-                        top.linkTo(shortInfo.bottom, margin = 8.dp)
-                        start.linkTo(startGuideline)
-                        end.linkTo(poster.start, margin = 16.dp)
-                        width = Dimension.fillToConstraints
-                    }
-                )
-            }
-
-            Text(
-                text = details.getShortInfo(),
-                style = MaterialTheme.typography.subtitle2,
-                textAlign = TextAlign.Center,
-                color = secondaryTextColor,
-                maxLines = 1,
-                modifier = Modifier
-                    .constrainAs(shortInfo) {
-                        top.linkTo(director.bottom, margin = 8.dp)
-                        start.linkTo(startGuideline)
-                        end.linkTo(endGuideline)
-                        width = Dimension.fillToConstraints
-                    }
-            )
-            var isSeeMoreButtonVisible by remember { mutableStateOf(true) }
-            Text(
-                text = details.overview,
-                color = primaryTextColor,
-                maxLines = if (isSeeMoreButtonVisible) 5 else Int.MAX_VALUE,
-                style = MaterialTheme.typography.body1,
-                overflow = if (isSeeMoreButtonVisible) TextOverflow.Ellipsis else TextOverflow.Visible,
-                modifier = Modifier
-                    .constrainAs(overview) {
-                        top.linkTo(poster.bottom, margin = 16.dp)
-                        start.linkTo(startGuideline)
-                        end.linkTo(endGuideline)
-                        width = Dimension.fillToConstraints
-                    }
-                    .animateContentSize()
-            )
-            val imageVector = if (isSeeMoreButtonVisible) Icons.Default.ArrowDropDown else Icons.Default.ArrowDropUp
-            var image by remember { mutableStateOf(imageVector) }
-            image = imageVector
-            Crossfade(
-                targetState = image,
-                modifier = Modifier.constrainAs(seeMoreButton) {
-                    top.linkTo(overview.bottom)
-                    start.linkTo(overview.start)
-                    end.linkTo(overview.end)
-                }) {
-                Icon(
-                    it,
-                    tint = white,
-                    modifier = Modifier
-                        .size(42.dp)
-                        .padding(4.dp)
-                        .clickable { isSeeMoreButtonVisible = !isSeeMoreButtonVisible },
-                    contentDescription = null
-                )
-            }
-            details.tags?.let {
-                LazyRow(modifier = Modifier.constrainAs(tags) {
-                    top.linkTo(seeMoreButton.bottom, margin = 16.dp)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    width = Dimension.fillToConstraints
-                }) {
-                    items(it) {
-                        ChipWithCounter(
-                            it.tag.title, it.tag.emojiCode, it.tag.backgroundColor, it.tag.textColor, it.count,
-                            Modifier.padding(vertical = 16.dp, horizontal = 12.dp)
-                        )
-                    }
-                }
-            }
-            Column(modifier = Modifier.constrainAs(friendsFeed) {
-                top.linkTo(tags.bottom, margin = 16.dp)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-                width = Dimension.fillToConstraints
-            }) {
-                if (!details.friendsReviews.isNullOrEmpty()) {
-                    Text(
-                        text = "Ревью друзей",
-                        style = MaterialTheme.typography.subtitle2,
-                        color = primaryTextColor
-                    )
-                    LazyRow(modifier = Modifier.padding(top = 8.dp)) {
-                        items(details.friendsReviews) {
-                            FeedReviewItem(feed = it, onLikeClicked = { _, _ -> }, onReviewClicked = {}) {}
-                        }
-                    }
-                }
-            }
-
-            Column(modifier = Modifier.constrainAs(cast) {
-                top.linkTo(friendsFeed.bottom, margin = 16.dp)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-                width = Dimension.fillToConstraints
-            }) {
-                if (!details.cast.isNullOrEmpty()) {
-                    Text(
-                        text = "Актеры",
-                        style = MaterialTheme.typography.subtitle2,
-                        color = primaryTextColor
-                    )
-                    LazyRow {
-                        items(details.cast) {
-                            MemberItem(it)
-                        }
-                    }
-                }
-            }
-
-            Column(modifier = Modifier.constrainAs(crew) {
-                top.linkTo(cast.bottom, margin = 8.dp)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-                width = Dimension.fillToConstraints
-            }) {
-                if (!details.crew.isNullOrEmpty()) {
-                    Text(
-                        text = "Съемочная группа",
-                        style = MaterialTheme.typography.subtitle2,
-                        color = primaryTextColor,
-                    )
-                    LazyRow {
-                        items(details.crew) {
-                            Timber.d(it.role)
-                            MemberItem(it)
-                        }
-                    }
-                }
+        LazyColumn() {
+            item { Backdrop(details.backdropPath) }
+            item { HeaderMovieInfo(details) }
+            item { Overview(details.overview) }
+            details.tags?.let { item { Tags(it) } }
+            if (!details.friendsReviews.isNullOrEmpty()) {
+                item { FriendsReviews(details.friendsReviews) }
             }
         }
     }
@@ -303,7 +112,7 @@ fun MemberItem(member: Member) {
 }
 
 @Composable
-fun Backdrop(backdropPath: String) {
+private fun Backdrop(backdropPath: String?) {
     Box {
         Image(
             painter = rememberTmdbBackdropPainter(backdropPath),
@@ -329,74 +138,282 @@ fun Backdrop(backdropPath: String) {
 }
 
 @Composable
-fun ActivitiesBottomBar(details: MovieDetails) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .navigationBarsPadding()
-            .then(HzPadding)
-            .heightIn(BottomBarHeight)
-    ) {
+private fun HeaderMovieInfo(details: MovieDetails) {
+    Row() {
+        Column(modifier = Modifier.weight(2f)) {
+            Text(
+                text = details.title,
+                style = MaterialTheme.typography.h6,
+                color = primaryTextColor,
+                textAlign = TextAlign.Start,
+                modifier = Modifier
+                    .padding(start = 16.dp, top = 16.dp, end = 16.dp)
+            )
 
+            details.getDirector()?.let {
+                Text(
+                    text = "Режиссер\n${it.name}",
+                    color = secondaryTextColor,
+                    style = MaterialTheme.typography.subtitle2,
+                    modifier = Modifier
+                        .padding(start = 16.dp, top = 8.dp, end = 16.dp)
+                )
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp)
+            ) {
+                Text(
+                    text = details.releaseYear,
+                    style = MaterialTheme.typography.subtitle2,
+                    textAlign = TextAlign.Center,
+                    color = secondaryTextColor,
+                    maxLines = 1,
+                    modifier = Modifier
+                        .padding(end = 2.dp)
+                )
+                Spacer(
+                    modifier = Modifier
+                        .size(4.dp)
+                        .background(primaryDarkColor, CircleShape)
+                )
+                Text(
+                    text = stringResource(R.string.movie_duration_text, details.runtime),
+                    style = MaterialTheme.typography.subtitle2,
+                    textAlign = TextAlign.Center,
+                    color = secondaryTextColor,
+                    maxLines = 1,
+                    modifier = Modifier
+                        .padding(start = 2.dp)
+                )
+            }
+
+            details.availability?.let {
+                Text(
+                    text = "Где посмотреть ->",
+                    color = secondaryTextColor,
+                    style = MaterialTheme.typography.body1,
+                    modifier = Modifier
+                        .padding(start = 16.dp, top = 8.dp, end = 16.dp)
+                        .clickable { }
+                )
+            }
+        }
+
+        Image(
+            painter = rememberTmdbPosterPainter(details.posterPath),
+            modifier = Modifier
+                .weight(1f)
+                .padding(top = 2.dp, end = 16.dp)
+                .height(150.dp),
+            contentDescription = null
+        )
     }
 }
 
-@ExperimentalAnimationApi
+@Composable
+private fun Overview(overview: String) {
+    var isSeeMoreButtonVisible by remember { mutableStateOf(true) }
+    val buttonAlpha = if (isSeeMoreButtonVisible) 1f else 0f
+    val buttonAlphaState: Float by animateFloatAsState(buttonAlpha)
+    Column {
+        Text(
+            text = overview,
+            color = primaryTextColor,
+            maxLines = if (isSeeMoreButtonVisible) 5 else Int.MAX_VALUE,
+            style = MaterialTheme.typography.body1,
+            overflow = if (isSeeMoreButtonVisible) TextOverflow.Ellipsis else TextOverflow.Visible,
+            modifier = Modifier
+                .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+                .clickable { isSeeMoreButtonVisible = !isSeeMoreButtonVisible }
+                .animateContentSize()
+        )
+        Icon(
+            imageVector = Icons.Default.MoreHoriz,
+            tint = secondaryTextColor,
+            modifier = Modifier
+                .padding(top = 2.dp)
+                .align(Alignment.CenterHorizontally)
+                .graphicsLayer { alpha = buttonAlphaState },
+            contentDescription = null
+        )
+    }
+}
+
+@Composable
+private fun Tags(tags: List<CountableTag>) {
+    CountableTagsGroup(
+        tags, modifier = Modifier
+            .wrapContentHeight()
+            .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+    )
+}
+
+@Composable
+private fun FriendsReviews(reviews: List<Feed>) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+    ) {
+
+        Text(
+            text = "Ревью друзей",
+            style = MaterialTheme.typography.h6,
+            color = primaryTextColor
+        )
+        LazyRow(
+            modifier = Modifier
+                .padding(top = 8.dp)
+                .heightIn(max = 200.dp)
+        ) {
+            items(reviews) { feed ->
+                ShortFeedReviewItem(feed = feed, modifier = Modifier.fillParentMaxWidth())
+            }
+        }
+    }
+}
+
+@Composable
+fun ActivitiesBottomBar(
+    movieId: Int,
+    isInWatchlist: Boolean,
+    onShareButtonClicked: () -> Unit,
+    onWatchlistButtonClicked: (movieId: Int, isInWatchlist: Boolean) -> Unit
+) {
+    Surface(
+        color = backgroundColor,
+        elevation = 8.dp
+    ) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .height(BottomBarHeight)
+                .selectableGroup(),
+            horizontalArrangement = Arrangement.Start,
+        ) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(64.dp)
+                    .padding(start = 16.dp)
+                    .clickable {
+                        onWatchlistButtonClicked.invoke(movieId, !isInWatchlist)
+                    }) {
+                Icon(
+                    if (isInWatchlist) Icons.Default.BookmarkBorder else {
+                        Icons.Default.Bookmark
+                    },
+                    tint = white,
+                    modifier = Modifier.size(24.dp),
+                    contentDescription = null
+                )
+            }
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(64.dp)
+                    .padding(start = 16.dp)
+                    .clickable { onShareButtonClicked.invoke() }) {
+                Icon(
+                    Icons.Default.Share,
+                    tint = white,
+                    modifier = Modifier.size(24.dp),
+                    contentDescription = null
+                )
+            }
+        }
+    }
+
+}
+
+@Preview
+@Composable
+fun HeaderMovieInfoPreview() {
+    HeaderMovieInfo(details)
+}
+
+@Preview
+@Composable
+fun TagsPreview() {
+    ActivitiesBottomBar(details.id, details.watchlist, {}, {_, _ ->})
+}
+
 @Preview
 @Composable
 fun PreviewMovieDetailsClear() {
     MovieDetails(
-        context = getContext(),
-        innerPadding = PaddingValues(),
-        details = MovieDetails(
-            515087,
-            "/flPdWe3qZPZfPUGIr2PKodeqIwz.jpg",
-            null,
-            listOf(Genres(18, "драма")),
-            "tt6458566",
-            "en",
-            "Esau",
-            "Эсав, по одноименному роману израильского автора Меира Шалева, следует за 40-летним писателем, который спустя полжизни возвращается в дом своей семьи, чтобы встретиться с братом, укравшим его любовь и средства к существованию. Эта история — современная интерпретация библейской истории Иакова и Исава из «Книги Бытия».",
-            0,
-            "/1hr94FDYyXzqGpfU3leAFbUkxm0.jpg",
-            listOf(),
-            "2019-11-04",
-            114,
-            "Released",
-            "tagline",
-            "Эсав",
-            false,
-            emptyList(),
-            listOf(
-                Cast(
-                    false,
-                    2,
-                    164,
-                    "Acting",
-                    "Lior Ashkenazi",
-                    "Lior Ashkenazi",
-                    1.62,
-                    "/c2IJJuYiqZNHoZVikp6HgCgbGkK.jpg",
-                    12,
-                    "Esau",
-                    "5abdeb890e0a264a5d008a54",
-                    0
-                )
-            ),
-            listOf(),
-            listOf(),
-            listOf(),
-            listOf(
-                CountableTag(Tag(1, "perviy", null, "33C22D3D", "FFC22D3D"), count = 1),
-                CountableTag(Tag(2, "vtoroy", null, "3373BFEE", "FF73BFEE"), count = 12),
-                CountableTag(Tag(3, "tretiy", null, "33EECAA4", "FFEECAA4"), count = 3)
-            ),
-            false,
-            false,
-            listOf(),
-            listOf(),
-            null,
-            null
-        )
+        details = details
     )
 }
+
+
+private val details = MovieDetails(
+    515087,
+    "/flPdWe3qZPZfPUGIr2PKodeqIwz.jpg",
+    null,
+    listOf(Genres(18, "драма")),
+    "tt6458566",
+    "en",
+    "Esau",
+    "Эсав, по одноименному роману израильского автора Меира Шалева, следует за 40-летним писателем, который спустя полжизни возвращается в дом своей семьи, чтобы встретиться с братом, укравшим его любовь и средства к существованию. Эта история — современная интерпретация библейской истории Иакова и Исава из «Книги Бытия».",
+    0,
+    "/1hr94FDYyXzqGpfU3leAFbUkxm0.jpg",
+    listOf(),
+    "2019-11-04",
+    114,
+    "Released",
+    "tagline",
+    "Эсав",
+    false,
+    emptyList(),
+    listOf(
+        Cast(
+            false,
+            2,
+            164,
+            "Acting",
+            "Lior Ashkenazi",
+            "Lior Ashkenazi",
+            1.62,
+            "/c2IJJuYiqZNHoZVikp6HgCgbGkK.jpg",
+            12,
+            "Esau",
+            "5abdeb890e0a264a5d008a54",
+            0
+        )
+    ),
+    listOf(
+        Crew(
+            false,
+            2,
+            164,
+            "Acting",
+            "Lior Ashkenazi",
+            "Lior Ashkenazi",
+            1.62,
+            "/c2IJJuYiqZNHoZVikp6HgCgbGkK.jpg",
+            "12",
+            "Director",
+            "Director",
+            ""
+        )
+    ),
+    listOf(),
+    listOf(),
+    listOf(
+        CountableTag(Tag(1, "perviy", null, "33C22D3D", "FFC22D3D"), count = 1),
+        CountableTag(Tag(2, "vtoroy", null, "3373BFEE", "FF73BFEE"), count = 12),
+        CountableTag(Tag(3, "tretiy", null, "33EECAA4", "FFEECAA4"), count = 3)
+    ),
+    false,
+    false,
+    listOf(),
+    listOf(),
+    null,
+    AvailabilityInfo(
+        1, "", 1, ""
+    )
+)

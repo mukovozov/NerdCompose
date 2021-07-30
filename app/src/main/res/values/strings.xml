@@ -14,6 +14,8 @@
     <string name="user_posts_title">Мои посты</string>
     <string name="user_posts_stub_title">Я еще ничего не написал</string>
 
+    <string name="movie_duration_text">%s минут</string>
+
     <string name="see_more_button_text">еще</string>
     <string name="see_less_button_text">свернуть</string>
 </resources>

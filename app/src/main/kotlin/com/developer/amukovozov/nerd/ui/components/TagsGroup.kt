@@ -22,13 +22,13 @@ import com.developer.amukovozov.nerd.ui.theme.primaryTextColor
 import timber.log.Timber
 
 private val tagHeight = 32.dp
-private var tagPadding = 8.dp
+private var tagPadding = 4.dp
 private var tagTopPadding = 0.dp
 
 @Composable
 fun CountableTagsGroup(tags: List<CountableTag>, modifier: Modifier = Modifier) {
-    tagTopPadding = 16.dp
-    tagPadding = 12.dp
+//    tagTopPadding = 16.dp
+//    tagPadding = 12.dp
     TagsGroupLayout(modifier = modifier) {
         tags.map {
             ChipWithCounter(it.tag.title, it.tag.emojiCode, it.tag.backgroundColor, it.tag.textColor, it.count)
@@ -38,8 +38,8 @@ fun CountableTagsGroup(tags: List<CountableTag>, modifier: Modifier = Modifier) 
 
 @Composable
 fun TagsGroup(modifier: Modifier = Modifier, tags: List<Tag>) {
-    tagTopPadding = 0.dp
-    tagPadding = 8.dp
+//    tagTopPadding = 0.dp
+//    tagPadding = 4.dp
     TagsGroupLayout(modifier = modifier) {
         tags.map { tag ->
             Chip(
@@ -82,15 +82,16 @@ private fun TagsGroupLayout(modifier: Modifier, content: @Composable () -> Unit)
         layout(constraints.maxWidth, tagHeight.roundToPx() * rowCount + tagTopPadding.roundToPx()) {
             var chipX = 0
             var chipY = tagTopPadding.roundToPx()
-            var drawedRow = 0
-            placeableToRow.entries.forEach { entry ->
+            var drawedRow = 1
+            val placeables = placeableToRow.keys.toList()
+            placeableToRow.entries.forEachIndexed { index, entry ->
                 val (placealbe, row) = entry
                 when {
-                    drawedRow == 0 -> {
+                    index == 0 -> {
                         placealbe.placeRelative(x = chipX, y = chipY)
                     }
                     row == drawedRow -> {
-                        chipX += placealbe.width + tagPadding.roundToPx()
+                        chipX += placeables[index - 1].width + tagPadding.roundToPx()
                         placealbe.placeRelative(x = chipX, y = chipY)
                     }
                     else -> {
@@ -123,25 +124,25 @@ fun ChipWithCounter(
             textColor = textColor
         )
         if (count > 0) {
-            Card(
-                modifier = Modifier
-                    .offset(x = 12.dp, y = (-16).dp)
-                    .align(Alignment.TopEnd),
-                border = BorderStroke(color = Color.Black, width = Dp.Hairline),
-                shape = RoundedCornerShape(12.dp),
-                backgroundColor = textColor.hexToColor(defaultColor = Color.Black)
-            ) {
+//            Card(
+//                modifier = Modifier
+//                    .offset(x = 12.dp, y = (-16).dp)
+//                    .align(Alignment.TopEnd),
+//                shape = RoundedCornerShape(12.dp)
+//            ) {
                 Text(
                     text = count.toString(),
                     style = MaterialTheme.typography.caption,
-                    color = primaryTextColor,
+                    color = textColor.hexToColor(),
                     modifier = Modifier
+                        .offset(x = 10.dp, y = (-14).dp)
+                        .align(Alignment.TopEnd)
                         .padding(
                             vertical = 8.dp,
                             horizontal = if (count < 10) 8.dp else 4.dp
                         )
                 )
-            }
+//            }
         }
     }
 }

@@ -1,9 +1,13 @@
 package com.developer.amukovozov.nerd.ui.screens.movie_details
 
-import android.content.Context
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,6 +27,7 @@ import com.developer.amukovozov.nerd.model.movie.Genres
 import com.developer.amukovozov.nerd.model.movie.MovieDetails
 import com.developer.amukovozov.nerd.ui.theme.primaryColor
 import com.developer.amukovozov.nerd.ui.theme.textColor
+import com.developer.amukovozov.nerd.ui.theme.white
 import com.developer.amukovozov.nerd.util.ui.*
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsPadding
@@ -61,16 +66,35 @@ fun MovieDetailsScreen(
     viewModel.onScreenOpened(movieId)
 
     Scaffold(
-        modifier = modifier
-            .statusBarsPadding()
-            .navigationBarsPadding()
-    ) { innerPadding ->
-        val context = getContext()
-
+        modifier = modifier,
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {},
+                shape = RoundedCornerShape(50),
+                backgroundColor = primaryColor
+            ) {
+                Icon(Icons.Filled.Add, "")
+            }
+        },
+        isFloatingActionButtonDocked = true,
+        floatingActionButtonPosition = FabPosition.End,
+        bottomBar = {
+            val screenState = viewModel.viewState.screenState
+            if (screenState is Content) {
+                BottomAppBar(
+                    cutoutShape = RoundedCornerShape(50),
+                    content = {
+                        val isInWatchlist = screenState.content?.watchlist ?: false
+                        ActivitiesBottomBar(movieId, isInWatchlist, viewModel::onShareButtonClicked, viewModel::onWatchlistButtonClicked)
+                    }
+                )
+            }
+        }
+    ) {
         when (val screenState = viewModel.viewState.screenState) {
             is Content -> {
                 screenState.content?.let {
-                    MovieDetails(context, it, innerPadding)
+                    MovieDetails(it)
                 }
             }
             is Loading -> {
@@ -88,226 +112,10 @@ fun MovieDetailsScreen(
     }
 }
 
-//@Composable
-//private fun MovieDetails(context: Context, details: MovieDetails, innerPadding: PaddingValues) {
-//    Box(Modifier.fillMaxWidth().padding(innerPadding)) {
-//        val scroll = rememberScrollState(0)
-//        Header(details.backdropPath, scroll.value)
-//        Body(details, scroll)
-//        Title(details, scroll.value)
-//        Image(details.posterPath ?: "", scroll.value)
-//    }
-//}
-
-@Composable
-private fun Header(backdropPath: String?, scroll: Int) {
-    Image(
-        painter = rememberTmdbBackdropPainter(backdropPath),
-        modifier = Modifier
-            .height(280.dp)
-            .fillMaxWidth(),
-        contentDescription = null
-    )
-
-    val maxOffset = with(LocalDensity.current) { MaxHeaderOffset.toPx() }
-    val minOffset = with(LocalDensity.current) { MinHeaderOffset.toPx() }
-    val offset = (maxOffset - scroll).coerceAtLeast(minOffset)
-    val futureAlpha = 1 - offset / maxOffset
-    Timber.d("offset = $offset  alpha = $futureAlpha")
-
-    Spacer(
-        modifier = Modifier
-            .height(280.dp)
-            .fillMaxWidth()
-            .graphicsLayer { alpha = futureAlpha }
-            .background(primaryColor)
-    )
-}
-
-@Composable
-private fun Title(details: MovieDetails, scroll: Int) {
-    val maxOffset = with(LocalDensity.current) { MaxTitleOffset.toPx() }
-    val minOffset = with(LocalDensity.current) { MinTitleOffset.toPx() }
-    val offset = (maxOffset - scroll).coerceAtLeast(minOffset)
-
-    Column(
-        verticalArrangement = Arrangement.Bottom,
-        modifier = Modifier
-            .heightIn(min = TitleHeight)
-            .statusBarsPadding()
-            .graphicsLayer { translationY = offset }
-    ) {
-        Spacer(Modifier.padding(8.dp))
-        Text(
-            text = details.title,
-            style = MaterialTheme.typography.h6,
-            modifier = HzPadding
-        )
-        details.tagline?.let {
-            Text(
-                text = it,
-                style = MaterialTheme.typography.subtitle2,
-                fontSize = 20.sp,
-                modifier = HzPadding
-            )
-        }
-        Spacer(Modifier.height(8.dp))
-    }
-}
-
-@Composable
-private fun Body(
-    details: MovieDetails,
-    scroll: ScrollState
-) {
-    Column {
-        Spacer(
-            modifier = Modifier
-                .fillMaxWidth()
-                .statusBarsPadding()
-                .height(MinTitleOffset)
-        )
-        Column(
-            modifier = Modifier.verticalScroll(scroll)
-        ) {
-            Spacer(Modifier.height(GradientScroll))
-            Surface(Modifier.fillMaxWidth()) {
-                Column {
-                    Spacer(Modifier.height(TitleHeight))
-                    Text(
-                        text = "Описание",
-                        style = MaterialTheme.typography.overline,
-                        color = textColor,
-                        modifier = HzPadding
-                    )
-                    Spacer(Modifier.height(16.dp))
-                    var seeMore by remember { mutableStateOf(true) }
-                    Text(
-                        text = details.overview,
-                        style = MaterialTheme.typography.body1,
-                        color = textColor,
-                        maxLines = if (seeMore) 5 else Int.MAX_VALUE,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = HzPadding
-                    )
-//                    val textButton = if (seeMore) {
-//                        stringResource(id = R.string.see_more)
-//                    } else {
-//                        stringResource(id = R.string.see_less)
-//                    }
-                    Text(
-                        text = details.overview,
-                        style = MaterialTheme.typography.button,
-                        textAlign = TextAlign.Center,
-                        color = textColor,
-                        modifier = Modifier
-                            .heightIn(20.dp)
-                            .fillMaxWidth()
-                            .padding(top = 15.dp)
-                            .clickable {
-                                seeMore = !seeMore
-                            }
-                    )
-                    Spacer(Modifier.height(40.dp))
-                    Text(
-                        text = details.overview,
-                        style = MaterialTheme.typography.overline,
-                        color = textColor,
-                        modifier = HzPadding
-                    )
-                    Spacer(Modifier.height(4.dp))
-                    Text(
-                        text = details.overview,
-                        style = MaterialTheme.typography.body1,
-                        color = textColor,
-                        modifier = HzPadding
-                    )
-
-                    Spacer(Modifier.height(16.dp))
-//                    JetsnackDivider()
-
-//                    related.forEach { snackCollection ->
-//                        key(snackCollection.id) {
-//                            SnackCollection(
-//                                snackCollection = snackCollection,
-//                                onSnackClick = { },
-//                                highlight = false
-//                            )
-//                        }
-//                    }
-
-//                    Spacer(
-//                        modifier = Modifier
-//                            .padding(bottom = BottomBarHeight)
-//                            .navigationBarsPadding(start = false, end = false)
-//                            .height(8.dp)
-//                    )
-                }
-            }
-        }
-    }
-}
-
-//@Composable
-//private fun Image(
-//    imageUrl: String,
-//    scroll: Int
-//) {
-//    val collapseRange = with(LocalDensity.current) { (MaxImageOffset - MinImageOffset).toPx() }
-//    val collapseFraction = (scroll / collapseRange).coerceIn(0f, 1f)
-//
-//    CollapsingImageToolbarLayout(
-//        collapseFraction = collapseFraction,
-//        modifier = HzPadding.then(Modifier.statusBarsPadding())
-//    ) {
-//        Image(
-//            painter = rememberTmdbPosterPainter(imageUrl),
-//            contentDescription = null,
-//            modifier = Modifier.fillMaxSize()
-//        )
-//    }
-//}
-
-
-@Composable
-fun CollapsingImageToolbarLayout(
-    collapseFraction: Float,
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
-) {
-    Layout(
-        modifier = modifier,
-        content = content
-    ) { measurables, constrainsts ->
-        check(measurables.size == 1)
-
-        val imageMaxSize = min(ExpandedImageSize.roundToPx(), constrainsts.maxWidth)
-        val imageMinSize = max(CollapsedImageSize.roundToPx(), constrainsts.minWidth)
-        val imageWidth = lerp(imageMaxSize, imageMinSize, collapseFraction)
-        val imagePlaceable = measurables[0].measure(Constraints.fixed(imageWidth, imageWidth))
-
-        val imageY = lerp(MaxImageOffset, MinImageOffset, collapseFraction).roundToPx()
-        val imageX = lerp(
-            (constrainsts.maxWidth - imageWidth), // center when expanded
-            constrainsts.maxWidth - imageWidth,
-            collapseFraction
-        )
-
-        layout(
-            constrainsts.maxWidth,
-            imageY + imageWidth
-        ) {
-            imagePlaceable.place(imageX, imageY)
-        }
-    }
-}
-
 @Preview
 @Composable
 fun PreviewMovieDetails() {
     MovieDetails(
-        context = getContext(),
-        innerPadding = PaddingValues(),
         details = MovieDetails(
             515087,
             "/flPdWe3qZPZfPUGIr2PKodeqIwz.jpg",

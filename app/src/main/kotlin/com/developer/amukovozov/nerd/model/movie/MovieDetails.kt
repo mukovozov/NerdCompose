@@ -66,8 +66,8 @@ data class MovieDetails(
     @Json(name = "availability")
     val availability: AvailabilityInfo?
 ) {
+    val releaseYear: String = releaseDate.subSequence(0, 4).toString()
+
     fun getDirector() =
         crew.find { it.job == "Director" }
-
-    fun getShortInfo() = "${releaseDate.subSequence(0, 3)} $runtime)"
 }
