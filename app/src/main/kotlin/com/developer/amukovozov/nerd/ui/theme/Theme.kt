@@ -1,9 +1,8 @@
 package com.developer.amukovozov.nerd.ui.theme
 
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.darkColors
-import androidx.compose.material.lightColors
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import ru.developer.amukovozov.nerd.ui.theme.*
 
 private val DarkColorPalette = darkColors(
@@ -31,3 +30,7 @@ fun NerdTheme(content: @Composable () -> Unit) {
         content = content
     )
 }
+
+val Colors.progressIndicatorBackground: Color
+    @Composable
+    get() = if (isLight) Color.Black.copy(alpha = 0.12f) else Color.White.copy(alpha = 0.24f)

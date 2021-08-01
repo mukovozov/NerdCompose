@@ -87,6 +87,9 @@ dependencies {
             Libs.Network.rxAndroid,
             Libs.Network.Moshi.core,
 
+            Libs.Coroutines.core,
+            Libs.Coroutines.android,
+
             Libs.Di.hiltAndroid,
 
             Libs.Debugging.timber,

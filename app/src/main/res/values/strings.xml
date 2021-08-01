@@ -18,4 +18,6 @@
 
     <string name="see_more_button_text">еще</string>
     <string name="see_less_button_text">свернуть</string>
+
+    <string name="feed_creation_total_steps_title">\u00A0из %d</string>
 </resources>

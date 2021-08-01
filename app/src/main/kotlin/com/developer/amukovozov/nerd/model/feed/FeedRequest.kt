@@ -12,5 +12,5 @@ data class FeedRequest(
     @Json(name = "type")
     val type: FeedType,
     @Json(name = "tags")
-    val tags: List<Tag>
+    val tags: List<Tag>?
 )

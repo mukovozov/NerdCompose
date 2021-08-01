@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltNavGraphViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.*
 import androidx.navigation.compose.*
 import com.developer.amukovozov.nerd.R
@@ -26,6 +27,8 @@ import com.developer.amukovozov.nerd.ui.screens.browse.Browse
 import com.developer.amukovozov.nerd.ui.screens.feed.Feed
 import com.developer.amukovozov.nerd.ui.screens.feed.FeedScreen
 import com.developer.amukovozov.nerd.ui.screens.feed.FeedViewModel
+import com.developer.amukovozov.nerd.ui.screens.feed_create.FeedCreateScreen
+import com.developer.amukovozov.nerd.ui.screens.feed_create.FeedCreateViewModel
 import com.developer.amukovozov.nerd.ui.screens.movie_details.MovieDetailsScreen
 import com.developer.amukovozov.nerd.ui.screens.movie_details.MovieDetailsViewModel
 import com.developer.amukovozov.nerd.ui.screens.profile.another.ProfileScreen
@@ -56,7 +59,8 @@ fun Home(
             .navigationBarsPadding(),
         topBar = {
             if (selectedTab != HomeTab.Profile &&
-                currentRoute != MovieDetailsScreen.Destination
+                currentRoute != MovieDetailsScreen.Destination &&
+                currentRoute != FeedCreateScreen.Destination
             ) {
                 TopAppBar(modifier = Modifier.statusBarsPadding()) {
                     Text(
@@ -67,7 +71,9 @@ fun Home(
             }
         },
         bottomBar = {
-            if (currentRoute != MovieDetailsScreen.Destination) {
+            if (currentRoute != MovieDetailsScreen.Destination &&
+                currentRoute != FeedCreateScreen.Destination
+            ) {
                 BottomNavigation {
                     navItems.forEach { screen ->
                         val isScreenSelected = screen.route == selectedTab.route
@@ -138,10 +144,31 @@ private fun NavGraphBuilder.feedNestedNavigation(
             }
         )
     ) {
-        val viewModel = hiltNavGraphViewModel<MovieDetailsViewModel>()
+        val viewModel = hiltViewModel<MovieDetailsViewModel>()
         val movieId = it.arguments?.getInt(MovieDetailsScreen.Argument) ?: return@composable
 
-        MovieDetailsScreen(movieId = movieId, viewModel = viewModel)
+        MovieDetailsScreen(
+            movieId = movieId,
+            viewModel = viewModel,
+            navController = navController
+        )
+    }
+    composable(
+        FeedCreateScreen.Destination,
+        arguments = listOf(
+            navArgument(FeedCreateScreen.Argument) {
+                type = NavType.IntType
+            }
+        )
+    ) {
+        val viewModel: FeedCreateViewModel = hiltViewModel()
+        val movieId = it.arguments?.getInt(FeedCreateScreen.Argument) ?: return@composable
+
+        FeedCreateScreen(
+            movieId = movieId,
+            viewModel = viewModel,
+            navController = navController
+        )
     }
 }
 

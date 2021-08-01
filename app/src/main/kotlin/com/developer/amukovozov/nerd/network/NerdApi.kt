@@ -6,6 +6,7 @@ import com.developer.amukovozov.nerd.model.UserInfo
 import com.developer.amukovozov.nerd.model.UserInfoDetails
 import com.developer.amukovozov.nerd.model.feed.Feed
 import com.developer.amukovozov.nerd.model.feed.FeedRequest
+import com.developer.amukovozov.nerd.model.feed.Tag
 import com.developer.amukovozov.nerd.model.movie.Movie
 import com.developer.amukovozov.nerd.model.movie.MovieDetails
 import io.reactivex.rxjava3.core.Completable
@@ -79,4 +80,13 @@ interface NerdApi {
 
     @GET("/movie/details")
     fun getMovieDetails(@Query("id") id: Int): Single<MovieDetails>
+
+    @GET("/movies/search")
+    fun searchMovies(@Query("query") query: String): Single<List<Movie>>
+
+    @GET("movie/short")
+    fun getShortMovieInfo(@Query("id") id: Int): Single<Movie>
+
+    @GET("tags")
+    fun getTags(): Single<List<Tag>>
 }

@@ -202,7 +202,7 @@ fun CountableTagsGroupPreview() {
 }
 
 
-private fun String?.hexToColor(defaultColor: Color = Color.White): Color {
+fun String?.hexToColor(defaultColor: Color = Color.White): Color {
     val colorRgb = this?.toLong(radix = 16) ?: return defaultColor
     return Color(colorRgb)
 }

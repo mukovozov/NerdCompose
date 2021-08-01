@@ -1,8 +1,10 @@
 package com.developer.amukovozov.nerd.repository
 
 import com.developer.amukovozov.nerd.model.feed.Feed
+import com.developer.amukovozov.nerd.model.feed.FeedRequest
 import com.developer.amukovozov.nerd.network.NerdApi
 import dagger.hilt.android.scopes.ViewModelScoped
+import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import javax.inject.Inject
 
@@ -24,5 +26,9 @@ class FeedRepository @Inject constructor(
     fun loadUserFeedPage(userId: Int, page: Int): Single<List<Feed>> {
         return nerdApi.getUserFeed(userId, page)
             .map { it.results ?: emptyList() }
+    }
+
+    fun createFeed(feedRequest: FeedRequest): Completable {
+        return nerdApi.createFeed(feedRequest)
     }
 }

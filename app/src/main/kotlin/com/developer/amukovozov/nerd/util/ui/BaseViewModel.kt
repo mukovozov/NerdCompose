@@ -1,6 +1,7 @@
 package com.developer.amukovozov.nerd.util.ui
 
 import androidx.lifecycle.ViewModel
+import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 
