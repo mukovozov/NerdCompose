@@ -40,7 +40,8 @@ import com.developer.amukovozov.nerd.ui.screens.feed.ShortFeedReviewItem
 import com.developer.amukovozov.nerd.ui.screens.feed_create.FeedCreateScreen
 import com.developer.amukovozov.nerd.ui.theme.*
 import com.developer.amukovozov.nerd.util.ui.*
-import com.google.accompanist.insets.systemBarsPadding
+import com.google.accompanist.insets.navigationBarsPadding
+import com.google.accompanist.insets.statusBarsPadding
 
 object MovieDetailsScreen {
     private const val Route = "movie_details"
@@ -101,7 +102,7 @@ fun MovieDetailsScreen(
         when (val screenState = viewModel.viewState.screenState) {
             is Content -> {
                 screenState.content?.let {
-                    MovieDetails(it)
+                    MovieDetails(it) { navController.navigateUp() }
                 }
             }
             is Loading -> {
@@ -120,16 +121,16 @@ fun MovieDetailsScreen(
 }
 
 @Composable
-fun MovieDetails(details: MovieDetails) {
+fun MovieDetails(details: MovieDetails, onBackPressed: () -> Unit) {
     val scrollState = rememberScrollState(0)
     Box(
         Modifier
             .fillMaxWidth()
-            .systemBarsPadding()
+            .navigationBarsPadding()
             .padding(bottom = 64.dp)
     ) {
         LazyColumn() {
-            item { Backdrop(details.backdropPath) }
+            item { Backdrop(details.backdropPath, onBackPressed) }
             item { HeaderMovieInfo(details) }
             item { Overview(details.overview) }
             details.tags?.let { item { Tags(it) } }
@@ -173,7 +174,7 @@ fun MemberItem(member: Member) {
 }
 
 @Composable
-private fun Backdrop(backdropPath: String?) {
+private fun Backdrop(backdropPath: String?, onBackPressed: () -> Unit) {
     Box {
         Image(
             painter = rememberTmdbBackdropPainter(backdropPath),
@@ -194,6 +195,16 @@ private fun Backdrop(backdropPath: String?) {
                         gradientStartY
                     ),
                 )
+        )
+        Icon(
+            Icons.Default.ArrowBack,
+            tint = white,
+            modifier = Modifier
+                .padding(16.dp)
+                .statusBarsPadding()
+                .size(32.dp)
+                .clickable { onBackPressed.invoke() },
+            contentDescription = null
         )
     }
 }
@@ -408,7 +419,7 @@ fun TagsPreview() {
 fun PreviewMovieDetailsClear() {
     MovieDetails(
         details = details
-    )
+    ) {}
 }
 
 
@@ -530,5 +541,5 @@ fun PreviewMovieDetails() {
             null,
             null
         )
-    )
+    ) {}
 }
