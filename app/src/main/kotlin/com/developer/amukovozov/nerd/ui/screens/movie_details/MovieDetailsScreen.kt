@@ -6,10 +6,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,6 +16,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -41,7 +39,9 @@ import com.developer.amukovozov.nerd.ui.screens.feed_create.FeedCreateScreen
 import com.developer.amukovozov.nerd.ui.theme.*
 import com.developer.amukovozov.nerd.util.ui.*
 import com.google.accompanist.insets.navigationBarsPadding
+import com.google.accompanist.insets.statusBarsHeight
 import com.google.accompanist.insets.statusBarsPadding
+import kotlin.math.max
 
 object MovieDetailsScreen {
     private const val Route = "movie_details"
@@ -122,15 +122,15 @@ fun MovieDetailsScreen(
 
 @Composable
 fun MovieDetails(details: MovieDetails, onBackPressed: () -> Unit) {
-    val scrollState = rememberScrollState(0)
+    val scrollState = rememberLazyListState()
     Box(
         Modifier
             .fillMaxWidth()
             .navigationBarsPadding()
             .padding(bottom = 64.dp)
     ) {
-        LazyColumn() {
-            item { Backdrop(details.backdropPath, onBackPressed) }
+        LazyColumn(state = scrollState) {
+            item { Backdrop(details.backdropPath) }
             item { HeaderMovieInfo(details) }
             item { Overview(details.overview) }
             details.tags?.let { item { Tags(it) } }
@@ -138,7 +138,49 @@ fun MovieDetails(details: MovieDetails, onBackPressed: () -> Unit) {
                 item { FriendsReviews(details.friendsReviews) }
             }
         }
+        CollapsableToolbar(modifier = Modifier.align(Alignment.TopStart), scrollState, details, onBackPressed)
     }
+}
+
+@Composable
+private fun CollapsableToolbar(
+    modifier :Modifier = Modifier,
+    scrollState: LazyListState,
+    details: MovieDetails,
+    onBackPressed: () -> Unit
+) {
+    val headerHeight = with(LocalDensity.current) { MaxHeaderOffset.toPx() }
+    val toolbarAlpha = if (scrollState.firstVisibleItemIndex == 0) {
+        max(0.0f, scrollState.firstVisibleItemScrollOffset / headerHeight)
+    } else {
+        1f
+    }
+    Box(
+        modifier = modifier
+            .statusBarsHeight(56.dp)
+            .fillMaxWidth()
+            .alpha(toolbarAlpha)
+            .background(primaryColor)
+    ) {
+        Text(
+            details.title,
+            style = MaterialTheme.typography.h6,
+            color = primaryTextColor,
+            modifier = Modifier
+                .statusBarsPadding()
+                .padding(top = 16.dp, start = 80.dp)
+        )
+    }
+    Icon(
+        Icons.Default.ArrowBack,
+        tint = white,
+        modifier = modifier
+            .padding(16.dp)
+            .statusBarsPadding()
+            .size(32.dp)
+            .clickable { onBackPressed.invoke() },
+        contentDescription = null
+    )
 }
 
 @Composable
@@ -174,7 +216,7 @@ fun MemberItem(member: Member) {
 }
 
 @Composable
-private fun Backdrop(backdropPath: String?, onBackPressed: () -> Unit) {
+private fun Backdrop(backdropPath: String?) {
     Box {
         Image(
             painter = rememberTmdbBackdropPainter(backdropPath),
@@ -195,16 +237,6 @@ private fun Backdrop(backdropPath: String?, onBackPressed: () -> Unit) {
                         gradientStartY
                     ),
                 )
-        )
-        Icon(
-            Icons.Default.ArrowBack,
-            tint = white,
-            modifier = Modifier
-                .padding(16.dp)
-                .statusBarsPadding()
-                .size(32.dp)
-                .clickable { onBackPressed.invoke() },
-            contentDescription = null
         )
     }
 }
