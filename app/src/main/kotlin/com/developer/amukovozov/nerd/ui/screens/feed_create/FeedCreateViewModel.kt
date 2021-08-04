@@ -84,7 +84,7 @@ class FeedCreateViewModel @Inject constructor(
                 it
             }
         }
-        val isNextButtonAvailable = viewState.tags.any { it.isSelected }
+        val isNextButtonAvailable = updatedList.any { it.isSelected }
         viewState = viewState.copy(tags = updatedList, isNextButtonEnabled = isNextButtonAvailable)
     }
 
@@ -93,12 +93,18 @@ class FeedCreateViewModel @Inject constructor(
         viewState = viewState.copy(tags = updatedList, isNextButtonEnabled = true)
     }
 
+    fun onReviewChanged(text: String) {
+        val updatedReviewState = viewState.review.copy(value = text)
+        val isNextButtonEnabled = updatedReviewState.isValid
+        viewState = viewState.copy(review = updatedReviewState, isNextButtonEnabled = isNextButtonEnabled)
+    }
+
     fun onStepFinished() {
         val nextStep = viewState.progressIndex + 1
         if (nextStep == 3) {
             onPublishReviewButtonClicked()
         } else {
-            viewState = viewState.copy(progressIndex = nextStep)
+            viewState = viewState.copy(progressIndex = nextStep, isNextButtonEnabled = false)
         }
     }
 
@@ -125,8 +131,7 @@ class FeedCreateViewModel @Inject constructor(
                 val updatedState = viewState.autoCompleteState.copy(query = it.title)
                 viewState = viewState.copy(
                     movie = it,
-                    autoCompleteState = updatedState,
-                    isNextButtonEnabled = true
+                    autoCompleteState = updatedState
                 )
             }, Timber::d)
             .disposeOnViewModelDestroy()

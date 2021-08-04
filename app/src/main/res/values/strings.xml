@@ -20,4 +20,9 @@
     <string name="see_less_button_text">свернуть</string>
 
     <string name="feed_creation_total_steps_title">\u00A0из %d</string>
+    <string name="feed_creation_add_movie_title">Про что расскажешь?</string>
+    <string name="feed_creation_movie_text_field_label">Фильм</string>
+    <string name="feed_creation_add_tags_title">Добавь теги</string>
+    <string name="feed_creation_add_review_title">И пару слов о фильме…</string>
+    <string name="feed_creation_review_text_field_label">Ревью</string>
 </resources>

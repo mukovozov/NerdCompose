@@ -26,7 +26,7 @@ data class FeedCreateViewState(
 
 data class TagState(val tag: Tag, val isSelected: Boolean)
 
-class ReviewFieldState : TextFieldState(::isReviewValid, ::reviewValidationError)
+data class ReviewFieldState(val value: String = "") : TextFieldState(value, ::isReviewValid, ::reviewValidationError)
 
 private fun reviewValidationError(review: String): String {
     return "Минимум 4 символа"

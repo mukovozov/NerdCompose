@@ -22,7 +22,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -56,7 +55,10 @@ object FeedCreateScreen {
     fun createDestination(movieId: Int) = "${Route}?$Argument=$movieId"
 }
 
-@OptIn(ExperimentalAnimationApi::class)
+private val CircleTagSize = 64.dp
+private val MoviePosterHeight = 75.dp
+private val MoviePosterWidth = 50.dp
+
 @Composable
 fun FeedCreateScreen(
     movieId: Int,
@@ -80,10 +82,55 @@ fun FeedCreateScreen(
             }
         },
         bottomBar = {
+//            val buttonText = if (viewModel.viewState.progressIndex == 2) "Опубликовать" else "Продолжить"
+//            Button(
+//                onClick = { viewModel.onStepFinished() },
+//                enabled = viewModel.viewState.isNextButtonEnabled,
+//                colors = ButtonDefaults.buttonColors(
+//                  backgroundColor = primaryColor
+//                ),
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .height(56.dp)
+//            ) {
+//                Text(
+//                    text = buttonText,
+//                    style = MaterialTheme.typography.h6
+//                )
+//            }
+        }) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            Box(modifier = Modifier.weight(1f)) {
+                val viewState = viewModel.viewState
+                when (viewState.progressIndex) {
+                    0 -> {
+                        // first step
+                        // choose movie
+                        FirstStep(
+                            autoCompleteState = viewState.autoCompleteState,
+                            onQueryChanged = viewModel::onQueryChanged,
+                            onMovieSelected = viewModel::onMovieSelected
+                        )
+                    }
+                    1 -> {
+                        // second step
+                        // add tags
+                        SecondStep(viewState.movie, viewState.tags, viewModel::onTagSelected)
+                    }
+                    2 -> {
+                        // third step
+                        // write review
+                        ThirdStep(reviewState = viewState.review, viewModel::onReviewChanged)
+                    }
+                }
+            }
             val buttonText = if (viewModel.viewState.progressIndex == 2) "Опубликовать" else "Продолжить"
             Button(
                 onClick = { viewModel.onStepFinished() },
                 enabled = viewModel.viewState.isNextButtonEnabled,
+                colors = ButtonDefaults.buttonColors(
+                  backgroundColor = primaryColor
+                ),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp)
@@ -92,28 +139,6 @@ fun FeedCreateScreen(
                     text = buttonText,
                     style = MaterialTheme.typography.h6
                 )
-            }
-        }) {
-        val viewState = viewModel.viewState
-        when (viewState.progressIndex) {
-            0 -> {
-                // first step
-                // choose movie
-                FirstStep(
-                    autoCompleteState = viewState.autoCompleteState,
-                    onQueryChanged = viewModel::onQueryChanged,
-                    onMovieSelected = viewModel::onMovieSelected
-                )
-            }
-            1 -> {
-                // second step
-                // add tags
-                SecondStep(viewState.movie, viewState.tags, viewModel::onTagSelected)
-            }
-            2 -> {
-                // third step
-                // write review
-                ThirdStep(reviewState = viewState.review)
             }
         }
     }
@@ -140,7 +165,7 @@ private fun FeedCreationTopBar(
                     Icon(
                         Icons.Filled.Close,
                         contentDescription = null,
-                        modifier = Modifier.align(Alignment.CenterEnd)
+                        modifier = Modifier.align(Alignment.Center)
                     )
                 }
             }
@@ -185,7 +210,6 @@ private fun TopAppBarTitle(
     )
 }
 
-@ExperimentalAnimationApi
 @Composable
 fun FirstStep(
     autoCompleteState: AutoCompleteState<Movie>,
@@ -196,19 +220,19 @@ fun FirstStep(
         modifier = Modifier.padding(16.dp)
     ) {
         Text(
-            "Про что расскажешь?",
+            stringResource(R.string.feed_creation_add_movie_title),
             style = MaterialTheme.typography.h6
         )
         val view = LocalView.current
 
         TextSearchBar(
             modifier = Modifier
-                .testTag("AutoCompleteSearchBarTag")
                 .fillMaxWidth()
                 .padding(top = 16.dp),
             value = autoCompleteState.query,
-            label = "Фильм",
+            label = stringResource(R.string.feed_creation_movie_text_field_label),
             colors = TextFieldDefaults.outlinedTextFieldColors(
+                cursorColor = primaryColor,
                 focusedBorderColor = primaryColor,
                 focusedLabelColor = primaryColor
             ),
@@ -238,9 +262,7 @@ fun FirstStep(
 private fun SecondStep(
     movie: Movie?,
     allTags: List<TagState>,
-    onTagSelected: (tag: Tag, isSelected: Boolean) -> Unit,
-    imeAction: ImeAction = ImeAction.Next,
-    onImeAction: () -> Unit = {}
+    onTagSelected: (tag: Tag, isSelected: Boolean) -> Unit
 ) {
     Column(
         modifier = Modifier.padding(16.dp)
@@ -249,8 +271,8 @@ private fun SecondStep(
             Image(
                 painter = rememberTmdbPosterPainter(movie?.posterPath),
                 modifier = Modifier
-                    .height(75.dp)
-                    .width(50.dp),
+                    .height(MoviePosterHeight)
+                    .width(MoviePosterWidth),
                 contentDescription = null
             )
             Text(
@@ -260,7 +282,7 @@ private fun SecondStep(
             )
         }
         Text(
-            "Добавь теги",
+            stringResource(R.string.feed_creation_add_tags_title),
             modifier = Modifier.padding(top = 16.dp),
             style = MaterialTheme.typography.h6
         )
@@ -277,6 +299,7 @@ private fun SecondStep(
 @Composable
 private fun ThirdStep(
     reviewState: TextFieldState,
+    onTextChanged: (String) -> Unit,
     imeAction: ImeAction = ImeAction.Next,
     onImeAction: () -> Unit = {}
 ) {
@@ -284,22 +307,24 @@ private fun ThirdStep(
         modifier = Modifier.padding(16.dp)
     ) {
         Text(
-            "И пару слов о фильме...",
+            stringResource(R.string.feed_creation_add_review_title),
             style = MaterialTheme.typography.h6
         )
         OutlinedTextField(
             value = reviewState.text,
             onValueChange = {
-                reviewState.text = it
+                onTextChanged.invoke(it)
+//                reviewState.text = it
             },
             colors = TextFieldDefaults.outlinedTextFieldColors(
+                cursorColor = primaryColor,
                 focusedBorderColor = primaryColor,
                 focusedLabelColor = primaryColor
             ),
             label = {
                 CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                     Text(
-                        text = "Ревью",
+                        text = stringResource(R.string.feed_creation_review_text_field_label),
                         style = MaterialTheme.typography.body2
                     )
                 }
@@ -331,8 +356,8 @@ fun MovieAutoCompleteItem(movie: Movie, onMovieSelected: (movie: Movie) -> Unit)
         Image(
             painter = rememberTmdbPosterPainter(movie.posterPath),
             modifier = Modifier
-                .height(75.dp)
-                .width(50.dp),
+                .height(MoviePosterHeight)
+                .width(MoviePosterWidth),
             contentDescription = null
         )
         Column(
@@ -354,7 +379,7 @@ fun CircleTagItem(tagState: TagState, onTagSelected: (tag: Tag, isSelected: Bool
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .size(64.dp)
+                .size(CircleTagSize)
                 .padding(4.dp)
                 .padding(top = 4.dp)
                 .clip(RoundedCornerShape(50))
@@ -375,7 +400,7 @@ fun CircleTagItem(tagState: TagState, onTagSelected: (tag: Tag, isSelected: Bool
                     contentDescription = null,
                     tint = primaryColor,
                     modifier = Modifier
-                        .size(64.dp)
+                        .size(CircleTagSize)
                         .background(whiteAlpha, RoundedCornerShape(50))
 
                 )
@@ -414,7 +439,7 @@ fun FeedCreateScreenPreview() {
 @Composable
 fun TagItemPreview() {
     TagItem(
-        tagState = TagState(Tag(1, "perviy", "\uD83D\uDE0D", "33C22D3D", "FFC22D3D"), isSelected = true),
+        tagState = TagState(Tag(1, "Colorful", "\uD83D\uDE0D", "33C22D3D", "FFC22D3D"), isSelected = true),
         onTagSelected = { _, _ -> })
 }
 
@@ -422,7 +447,7 @@ fun TagItemPreview() {
 @Composable
 fun CircleTagItemPreview() {
     CircleTagItem(
-        tagState = TagState(Tag(1, "perviy", "\uD83D\uDE0D", "33C22D3D", "FFC22D3D"), isSelected = false),
+        tagState = TagState(Tag(1, "Amazing", "\uD83D\uDE0D", "33C22D3D", "FFC22D3D"), isSelected = false),
         onTagSelected = { _, _ -> })
 }
 
@@ -464,7 +489,7 @@ fun TagItem(tagState: TagState, onTagSelected: (tag: Tag, isSelected: Boolean) -
                 tint = primaryColor,
                 modifier = Modifier
                     .size(16.dp)
-                    .offset(x = 4.dp, y = -8.dp)
+                    .offset(x = 4.dp, y = (-8).dp)
                     .align(Alignment.TopEnd)
                     .background(whiteAlpha, RoundedCornerShape(50))
 

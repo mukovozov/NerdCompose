@@ -295,6 +295,7 @@ private fun Overview(overview: String) {
             modifier = Modifier
                 .padding(top = 2.dp)
                 .align(Alignment.CenterHorizontally)
+                .clickable { isSeeMoreButtonVisible = !isSeeMoreButtonVisible }
                 .graphicsLayer { alpha = buttonAlphaState },
             contentDescription = null
         )
