@@ -20,13 +20,15 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -35,32 +37,29 @@ import androidx.navigation.NavController
 import com.developer.amukovozov.nerd.R
 import com.developer.amukovozov.nerd.model.feed.Tag
 import com.developer.amukovozov.nerd.model.movie.Movie
+import com.developer.amukovozov.nerd.ui.components.GridLazyLayout
+import com.developer.amukovozov.nerd.ui.components.GridType
 import com.developer.amukovozov.nerd.ui.components.hexToColor
 import com.developer.amukovozov.nerd.ui.components.searchbar.TextSearchBar
 import com.developer.amukovozov.nerd.ui.components.searchbar.autocomplete.AutoCompleteState
-import com.developer.amukovozov.nerd.ui.screens.feed.FeedScreen
 import com.developer.amukovozov.nerd.ui.theme.primaryColor
 import com.developer.amukovozov.nerd.ui.theme.progressIndicatorBackground
-import com.developer.amukovozov.nerd.ui.theme.white
+import com.developer.amukovozov.nerd.ui.theme.whiteAlpha
 import com.developer.amukovozov.nerd.util.ui.rememberTmdbPosterPainter
 import com.google.accompanist.insets.systemBarsPadding
-import kotlinx.coroutines.Job
 
 object FeedCreateScreen {
     private const val Route = "feed_create"
     const val Argument = "id"
-    const val Destination = "${Route}/{$Argument}"
+    const val Destination = "$Route?$Argument={$Argument}"
 
-    fun createDestination(movieId: Int) = "${Route}/$movieId"
+    fun createDestination(movieId: Int) = "${Route}?$Argument=$movieId"
 }
-
-private val DELAY_TIME = 2000L
-private var job: Job? = null
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun FeedCreateScreen(
-    movieId: Int?,
+    movieId: Int,
     viewModel: FeedCreateViewModel,
     navController: NavController,
     modifier: Modifier = Modifier
@@ -265,27 +264,11 @@ private fun SecondStep(
             modifier = Modifier.padding(top = 16.dp),
             style = MaterialTheme.typography.h6
         )
-        val columns = 3
-        val rows = (allTags.size + columns - 1) / columns
-        LazyColumn(modifier = Modifier.fillMaxWidth()) {
-            items(rows) { rowIndex ->
-                Row {
-                    for (columnIndex in 0 until columns) {
-                        val itemIndex = rowIndex * columns + columnIndex
-                        if (itemIndex < allTags.size) {
-                            Box(
-                                modifier = Modifier.weight(1f, fill = true),
-                                propagateMinConstraints = true
-                            ) {
-                                val tagState = allTags[itemIndex]
-                                TagItem(tag = tagState.tag, tagState.isSelected, onTagSelected)
-                            }
-                        } else {
-                            Spacer(Modifier.weight(1f, fill = true))
-                        }
-                    }
-                }
-
+        val columns = 4
+        GridLazyLayout(gridType = GridType.Fixed(columns)) {
+            items(allTags.size) { index ->
+                val tagState = allTags[index]
+                CircleTagItem(tagState, onTagSelected)
             }
         }
     }
@@ -362,42 +345,52 @@ fun MovieAutoCompleteItem(movie: Movie, onMovieSelected: (movie: Movie) -> Unit)
 }
 
 @Composable
-fun TagItem(tag: Tag, selected: Boolean, onTagSelected: (tag: Tag, isSelected: Boolean) -> Unit) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier
-            .height(100.dp)
-            .padding(4.dp)
-            .background(tag.backgroundColor.hexToColor(), RoundedCornerShape(50))
-            .clickable { onTagSelected.invoke(tag, !selected) }
+fun CircleTagItem(tagState: TagState, onTagSelected: (tag: Tag, isSelected: Boolean) -> Unit) {
+    val (tag, isSelected) = tagState
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(horizontal = 4.dp)
     ) {
-        Row(
-            modifier = Modifier.padding(start = 8.dp, top = 4.dp, end = 8.dp, bottom = 4.dp),
-            verticalAlignment = Alignment.CenterVertically
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .size(64.dp)
+                .padding(4.dp)
+                .padding(top = 4.dp)
+                .clip(RoundedCornerShape(50))
+                .background(tag.backgroundColor.hexToColor(), RoundedCornerShape(50))
+                .clickable { onTagSelected.invoke(tag, !isSelected) }
         ) {
             tag.emojiCode?.let {
                 val processed = EmojiCompat.get().process(tag.emojiCode)
-                Text(text = processed.toString())
-                Spacer(Modifier.width(4.dp))
+                Text(
+                    text = processed.toString(),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.h5
+                )
             }
+            if (isSelected) {
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = null,
+                    tint = primaryColor,
+                    modifier = Modifier
+                        .size(64.dp)
+                        .background(whiteAlpha, RoundedCornerShape(50))
 
-            val tColor = tag.textColor.hexToColor()
-            Text(
-                text = tag.title,
-                color = tColor, style = MaterialTheme.typography.caption
-            )
+                )
+            }
         }
-        if (selected) {
-            Icon(
-                imageVector = Icons.Default.Check,
-                contentDescription = null,
-                tint = tag.textColor.hexToColor(),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(white, RoundedCornerShape(50))
-                    .alpha(0.3f)
-            )
-        }
+        val tColor = tag.textColor.hexToColor()
+        Text(
+            text = tag.title,
+            color = tColor,
+            modifier = Modifier.fillMaxWidth(),
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 2,
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.caption
+        )
     }
 }
 
@@ -415,4 +408,67 @@ fun FeedCreateScreenPreview() {
         onQueryChanged = {},
         {}
     )
+}
+
+@Preview
+@Composable
+fun TagItemPreview() {
+    TagItem(
+        tagState = TagState(Tag(1, "perviy", "\uD83D\uDE0D", "33C22D3D", "FFC22D3D"), isSelected = true),
+        onTagSelected = { _, _ -> })
+}
+
+@Preview
+@Composable
+fun CircleTagItemPreview() {
+    CircleTagItem(
+        tagState = TagState(Tag(1, "perviy", "\uD83D\uDE0D", "33C22D3D", "FFC22D3D"), isSelected = false),
+        onTagSelected = { _, _ -> })
+}
+
+// probably should be removed
+@Composable
+fun TagItem(tagState: TagState, onTagSelected: (tag: Tag, isSelected: Boolean) -> Unit) {
+    val (tag, isSelected) = tagState
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+//            .height(100.dp)
+            .padding(4.dp)
+            .background(tag.backgroundColor.hexToColor(), RoundedCornerShape(50))
+            .clickable { onTagSelected.invoke(tag, !isSelected) }
+    ) {
+        Row(
+            modifier = Modifier.padding(start = 8.dp, top = 8.dp, end = 8.dp, bottom = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            tag.emojiCode?.let {
+                val processed = EmojiCompat.get().process(tag.emojiCode)
+                Text(text = processed.toString(), textAlign = TextAlign.Center)
+                Spacer(Modifier.width(4.dp))
+            }
+
+            val tColor = tag.textColor.hexToColor()
+            Text(
+                text = tag.title,
+                color = tColor,
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.caption
+            )
+        }
+        if (isSelected) {
+            Icon(
+                imageVector = Icons.Default.Check,
+                contentDescription = null,
+                tint = primaryColor,
+                modifier = Modifier
+                    .size(16.dp)
+                    .offset(x = 4.dp, y = -8.dp)
+                    .align(Alignment.TopEnd)
+                    .background(whiteAlpha, RoundedCornerShape(50))
+
+            )
+        }
+    }
 }

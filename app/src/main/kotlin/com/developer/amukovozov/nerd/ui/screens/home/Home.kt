@@ -4,9 +4,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.AccountCircle
@@ -39,6 +41,7 @@ import com.developer.amukovozov.nerd.ui.screens.profile_list.ProfileListScreen
 import com.developer.amukovozov.nerd.ui.screens.profile_list.ProfileListType
 import com.developer.amukovozov.nerd.ui.screens.profile_list.ProfileListViewModel
 import com.developer.amukovozov.nerd.ui.theme.backgroundColor
+import com.developer.amukovozov.nerd.ui.theme.primaryColor
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsPadding
 
@@ -67,6 +70,21 @@ fun Home(
                         text = stringResource(id = R.string.feed_app_bar_title),
                         style = MaterialTheme.typography.h5
                     )
+                }
+            }
+        },
+        floatingActionButton = {
+            if (currentRoute != MovieDetailsScreen.Destination &&
+                currentRoute != FeedCreateScreen.Destination
+            ) {
+                FloatingActionButton(
+                    onClick = {
+                        navController.navigate(FeedCreateScreen.createDestination(0))
+                    },
+                    shape = RoundedCornerShape(50),
+                    backgroundColor = primaryColor
+                ) {
+                    Icon(Icons.Filled.Add, "")
                 }
             }
         },
@@ -158,6 +176,7 @@ private fun NavGraphBuilder.feedNestedNavigation(
         arguments = listOf(
             navArgument(FeedCreateScreen.Argument) {
                 type = NavType.IntType
+                defaultValue = 0
             }
         )
     ) {

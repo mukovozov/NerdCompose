@@ -32,10 +32,10 @@ class FeedCreateViewModel @Inject constructor(
         loadTags()
     }
 
-    fun onScreenOpened(movieId: Int?) {
+    fun onScreenOpened(movieId: Int) {
         if (!isInited) {
-            viewState = viewState.copy(movieId = movieId)
-            if (movieId != null) {
+            if (movieId != 0) {
+                viewState = viewState.copy(movieId = movieId, progressIndex = 1)
                 loadMovieInfo(movieId)
             }
             isInited = true
