@@ -21,6 +21,7 @@ import com.developer.amukovozov.nerd.model.FullUserInfo
 import com.developer.amukovozov.nerd.model.SocialMediaLink
 import com.developer.amukovozov.nerd.model.UserInfoDetails
 import com.developer.amukovozov.nerd.ui.screens.feed.FeedReviewItem
+import com.developer.amukovozov.nerd.ui.screens.movie_details.MovieDetailsScreen
 import com.developer.amukovozov.nerd.ui.screens.profile.*
 import com.developer.amukovozov.nerd.ui.screens.profile_list.ProfileListScreen
 import com.developer.amukovozov.nerd.ui.screens.profile_list.ProfileListType
@@ -65,6 +66,9 @@ fun MyProfileScreen(
                         },
                         onLinkClicked = { link ->
                             openInChromeTab(context, link.link)
+                        },
+                        onWatchlistMovieClicked = { movieId ->
+                            navController.navigate(MovieDetailsScreen.createDestination(movieId))
                         }
                     )
                 }
@@ -91,7 +95,8 @@ private fun MyProfileInfo(
     onEditButtonClicked: () -> Unit,
     onFollowersClicked: (userId: Int) -> Unit,
     onFollowingsClicked: (userId: Int) -> Unit,
-    onLinkClicked: (SocialMediaLink) -> Unit
+    onLinkClicked: (SocialMediaLink) -> Unit,
+    onWatchlistMovieClicked: (movieId: Int) -> Unit
 ) {
     LazyColumn {
         item { MyProfileSettingsButtons(onLogoutButtonClicked, onEditButtonClicked) }
@@ -100,7 +105,8 @@ private fun MyProfileInfo(
                 fullUserInfo = fullUserInfo,
                 onFollowersClicked = onFollowersClicked,
                 onFollowingsClicked = onFollowingsClicked,
-                onLinkClicked = onLinkClicked
+                onLinkClicked = onLinkClicked,
+                onWatchlistMovieClicked = onWatchlistMovieClicked
             )
         }
         if (fullUserInfo.posts.isNotEmpty()) {
@@ -116,7 +122,8 @@ private fun MyProfileInformation(
     fullUserInfo: FullUserInfo,
     onFollowersClicked: (userId: Int) -> Unit,
     onFollowingsClicked: (userId: Int) -> Unit,
-    onLinkClicked: (SocialMediaLink) -> Unit
+    onLinkClicked: (SocialMediaLink) -> Unit,
+    onWatchlistMovieClicked: (movieId: Int) -> Unit
 ) {
     val userInfo = fullUserInfo.userInfo
     Column(modifier = Modifier.padding(top = 8.dp, start = 24.dp, end = 24.dp)) {
@@ -131,7 +138,7 @@ private fun MyProfileInformation(
         UserDescription(userInfo)
         UserSocialMediaLinks(userInfo, onLinkClicked)
 
-        UserWatchlist(fullUserInfo)
+        UserWatchlist(fullUserInfo, onWatchlistMovieClicked)
         UserPostsTitle(fullUserInfo)
     }
 }
@@ -175,6 +182,7 @@ fun ProfilePreview() {
             emptyList(),
             emptyList()
         ),
+        {},
         {},
         {},
         {},

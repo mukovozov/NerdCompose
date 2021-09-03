@@ -1,12 +1,12 @@
 package com.developer.amukovozov.nerd.util.ui
 
 import androidx.annotation.DrawableRes
+import androidx.compose.material.icons.Icons
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntSize
 import coil.request.ImageRequest
-import coil.transform.RoundedCornersTransformation
-import coil.transform.Transformation
+import coil.transform.CircleCropTransformation
 import com.developer.amukovozov.nerd.R
 import com.google.accompanist.coil.rememberCoilPainter
 import com.google.accompanist.imageloading.LoadPainter
@@ -26,12 +26,18 @@ fun rememberTmdbPosterPainter(
 }
 
 @Composable
-fun rememberTmdbProfilePainter(
-    profilePath: String?,
+fun rememberProfilePainter(
+    avatarPath: String?,
     @DrawableRes previewPlaceHolder: Int = R.drawable.ic_launcher_foreground,
     requestBuilder: (ImageRequest.Builder.(size: IntSize) -> ImageRequest.Builder)? = null
 ): LoadPainter<Any> {
-    return rememberTmdbCoilPainter(POSTER_WIDTH, profilePath, previewPlaceHolder, requestBuilder)
+    return rememberCoilPainter(
+        request = avatarPath,
+        requestBuilder = { transformations(CircleCropTransformation()) },
+        fadeIn = true,
+        previewPlaceholder = R.drawable.ic_user_placeholder
+    )
+
 }
 
 @Composable

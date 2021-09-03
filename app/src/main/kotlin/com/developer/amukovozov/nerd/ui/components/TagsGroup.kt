@@ -1,6 +1,7 @@
 package com.developer.amukovozov.nerd.ui.components
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
@@ -11,14 +12,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.Placeable
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.emoji.text.EmojiCompat
 import com.developer.amukovozov.nerd.model.feed.CountableTag
 import com.developer.amukovozov.nerd.model.feed.Tag
-import com.developer.amukovozov.nerd.ui.theme.primaryTextColor
 import timber.log.Timber
 
 private val tagHeight = 32.dp
@@ -36,20 +38,39 @@ fun CountableTagsGroup(tags: List<CountableTag>, modifier: Modifier = Modifier) 
     }
 }
 
+private var coordinates: List<Pair<Int, LayoutCoordinates>> = emptyList()
+
 @Composable
-fun TagsGroup(modifier: Modifier = Modifier, tags: List<Tag>) {
+fun TagsGroup(
+    modifier: Modifier = Modifier,
+    tags: List<Tag>,
+    onTagClicked: ((Tag) -> Unit)? = null
+) {
 //    tagTopPadding = 0.dp
 //    tagPadding = 4.dp
     TagsGroupLayout(modifier = modifier) {
         tags.map { tag ->
             Chip(
+                modifier = Modifier
+                    .onGloballyPositioned {
+                        coordinates.plus(tag.id to it)
+                    }
+                    .clickable {
+                        onTagClicked?.invoke(tag)
+                    },
                 text = tag.title,
                 emojiCode = tag.emojiCode,
                 backgroundColor = tag.backgroundColor,
-                textColor = tag.textColor
+                textColor = tag.textColor,
             )
         }
     }
+}
+
+fun getTagCoordinates(tagId: Int): LayoutCoordinates {
+    return coordinates
+        .first { it.first == tagId }
+        .second
 }
 
 @Composable
@@ -130,18 +151,18 @@ fun ChipWithCounter(
 //                    .align(Alignment.TopEnd),
 //                shape = RoundedCornerShape(12.dp)
 //            ) {
-                Text(
-                    text = count.toString(),
-                    style = MaterialTheme.typography.caption,
-                    color = textColor.hexToColor(),
-                    modifier = Modifier
-                        .offset(x = 10.dp, y = (-14).dp)
-                        .align(Alignment.TopEnd)
-                        .padding(
-                            vertical = 8.dp,
-                            horizontal = if (count < 10) 8.dp else 4.dp
-                        )
-                )
+            Text(
+                text = count.toString(),
+                style = MaterialTheme.typography.caption,
+                color = textColor.hexToColor(),
+                modifier = Modifier
+                    .offset(x = 10.dp, y = (-14).dp)
+                    .align(Alignment.TopEnd)
+                    .padding(
+                        vertical = 8.dp,
+                        horizontal = if (count < 10) 8.dp else 4.dp
+                    )
+            )
 //            }
         }
     }

@@ -35,4 +35,8 @@ class UserRepository @Inject constructor(
     fun getUserFollowers(userId: Int): Single<List<UserInfo>> {
         return api.getUserFollowers(userId)
     }
+
+    fun getUsersPopular(): Single<List<UserInfo>> {
+        return api.getUsersPopular()
+    }
 }

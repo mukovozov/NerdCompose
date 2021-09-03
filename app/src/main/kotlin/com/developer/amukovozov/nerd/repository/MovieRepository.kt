@@ -14,6 +14,14 @@ class MovieRepository @Inject constructor(
         return api.searchMovies(query)
     }
 
+    fun getPopularMovies(): Single<List<Movie>> {
+        return api.getMoviesPopular()
+    }
+
+    fun searchMovieByTag(tagId: Int): Single<List<Movie>> {
+        return api.searchMoviesByTag(tagId)
+    }
+
     fun getMovieShortInfo(id: Int): Single<Movie> {
         return api.getShortMovieInfo(id)
     }

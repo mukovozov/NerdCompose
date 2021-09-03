@@ -14,7 +14,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 
 @Composable
-fun TextSearchBar(
+fun OutlinedTextSearchBar(
     modifier: Modifier = Modifier,
     value: String,
     label: String,
@@ -25,6 +25,42 @@ fun TextSearchBar(
     onValueChanged: (String) -> Unit
 ) {
     OutlinedTextField(
+        modifier = modifier
+            .fillMaxWidth(.9f)
+            .onFocusChanged { onFocusChanged(it) },
+        value = value,
+        colors = colors,
+        onValueChange = { query ->
+            onValueChanged(query)
+        },
+        label = { Text(text = label) },
+        textStyle = MaterialTheme.typography.subtitle1,
+        singleLine = true,
+        trailingIcon = {
+            IconButton(onClick = { onClearClick() }) {
+                Icon(imageVector = Icons.Filled.Clear, contentDescription = "Clear")
+            }
+        },
+        keyboardActions = KeyboardActions(onDone = { onDoneActionClick() }),
+        keyboardOptions = KeyboardOptions(
+            imeAction = ImeAction.Done,
+            keyboardType = KeyboardType.Text
+        )
+    )
+}
+
+@Composable
+fun TextSearchBar(
+    modifier: Modifier = Modifier,
+    value: String,
+    label: String,
+    colors: TextFieldColors = TextFieldDefaults.textFieldColors(),
+    onDoneActionClick: () -> Unit = {},
+    onClearClick: () -> Unit = {},
+    onFocusChanged: (FocusState) -> Unit = {},
+    onValueChanged: (String) -> Unit
+) {
+    TextField(
         modifier = modifier
             .fillMaxWidth(.9f)
             .onFocusChanged { onFocusChanged(it) },

@@ -39,7 +39,7 @@ import com.developer.amukovozov.nerd.model.movie.Movie
 import com.developer.amukovozov.nerd.ui.components.GridLazyLayout
 import com.developer.amukovozov.nerd.ui.components.GridType
 import com.developer.amukovozov.nerd.ui.components.hexToColor
-import com.developer.amukovozov.nerd.ui.components.searchbar.TextSearchBar
+import com.developer.amukovozov.nerd.ui.components.searchbar.OutlinedTextSearchBar
 import com.developer.amukovozov.nerd.ui.components.searchbar.autocomplete.AutoCompleteState
 import com.developer.amukovozov.nerd.ui.theme.primaryColor
 import com.developer.amukovozov.nerd.ui.theme.progressIndicatorBackground
@@ -225,7 +225,7 @@ fun FirstStep(
         )
         val view = LocalView.current
 
-        TextSearchBar(
+        OutlinedTextSearchBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 16.dp),

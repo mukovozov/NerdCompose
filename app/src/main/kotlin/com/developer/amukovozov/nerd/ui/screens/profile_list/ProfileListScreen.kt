@@ -24,6 +24,7 @@ import com.developer.amukovozov.nerd.ui.theme.primaryColor
 import com.developer.amukovozov.nerd.util.ui.Content
 import com.developer.amukovozov.nerd.util.ui.Loading
 import com.developer.amukovozov.nerd.util.ui.Stub
+import com.developer.amukovozov.nerd.util.ui.rememberProfilePainter
 import com.google.accompanist.coil.rememberCoilPainter
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsPadding
@@ -120,10 +121,7 @@ fun UserInfoItem(userInfo: UserInfo, onItemClicked: (UserId: Int) -> Unit) {
             modifier = Modifier.fillMaxWidth()
         ) {
             Image(
-                painter = rememberCoilPainter(request = userInfo.avatarPath,
-                    requestBuilder = {
-                        transformations(CircleCropTransformation())
-                    }),
+                painter = rememberProfilePainter(avatarPath = userInfo.avatarPath),
                 modifier = Modifier
                     .width(64.dp)
                     .height(64.dp),

@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.transform.CircleCropTransformation
@@ -58,7 +59,7 @@ fun UserPostsTitle(fullUserInfo: FullUserInfo) {
 }
 
 @Composable
-fun UserWatchlist(fullUserInfo: FullUserInfo) {
+fun UserWatchlist(fullUserInfo: FullUserInfo, onMovieClicked: (movieId: Int) -> Unit) {
     if (fullUserInfo.watchList.isEmpty()) {
         Text(
             text = stringResource(R.string.watchlist_stub_title),
@@ -70,7 +71,7 @@ fun UserWatchlist(fullUserInfo: FullUserInfo) {
             collectionTitle = stringResource(R.string.watchlist_title),
             items = {
                 items(fullUserInfo.watchList) {
-                    WatchlistItem(it)
+                    WatchlistItem(it, onMovieClicked)
                 }
             }
         )
@@ -201,14 +202,15 @@ private fun ProfileSocialMediaLink(link: SocialMediaLink, onLinkClicked: (Social
 fun WatchlistCollection(
     modifier: Modifier = Modifier,
     collectionTitle: String,
-    items: LazyListScope.() -> Unit
+    items: LazyListScope.() -> Unit,
+    collectionTitleStyle: TextStyle = MaterialTheme.typography.h6
 ) {
     Column(modifier = modifier.padding(top = 16.dp)) {
         Box(Modifier.fillMaxWidth()) {
             Text(
                 text = collectionTitle,
                 modifier = Modifier.align(Alignment.TopStart),
-                style = MaterialTheme.typography.h6
+                style = collectionTitleStyle
             )
             Icon(
                 imageVector = Icons.Filled.ArrowForward,
@@ -226,14 +228,16 @@ fun WatchlistCollection(
 }
 
 @Composable
-fun WatchlistItem(movie: Movie) {
+fun WatchlistItem(movie: Movie, onMovieClicked: (movieId: Int) -> Unit) {
     Column {
         Image(
             painter = rememberTmdbPosterPainter(movie.posterPath),
             modifier = Modifier
                 .clip(RoundedCornerShape(12.dp))
                 .width(88.dp)
-                .height(130.dp),
+                .height(130.dp)
+                .clickable { onMovieClicked.invoke(movie.id) }
+            ,
             contentDescription = null
         )
     }

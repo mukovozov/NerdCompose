@@ -34,6 +34,7 @@ import com.developer.amukovozov.nerd.model.feed.Feed
 import com.developer.amukovozov.nerd.model.feed.Tag
 import com.developer.amukovozov.nerd.model.movie.*
 import com.developer.amukovozov.nerd.ui.components.CountableTagsGroup
+import com.developer.amukovozov.nerd.ui.components.searchbar.LoadingScreen
 import com.developer.amukovozov.nerd.ui.screens.feed.ShortFeedReviewItem
 import com.developer.amukovozov.nerd.ui.screens.feed_create.FeedCreateScreen
 import com.developer.amukovozov.nerd.ui.theme.*
@@ -106,12 +107,7 @@ fun MovieDetailsScreen(
                 }
             }
             is Loading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(color = primaryColor)
-                }
+                LoadingScreen()
             }
             is Stub -> {
                 // todo show stub
@@ -407,8 +403,8 @@ fun ActivitiesBottomBar(
                         onWatchlistButtonClicked.invoke(movieId, !isInWatchlist)
                     }) {
                 Icon(
-                    if (isInWatchlist) Icons.Default.BookmarkBorder else {
-                        Icons.Default.Bookmark
+                    if (isInWatchlist) Icons.Default.Bookmark else {
+                        Icons.Default.BookmarkBorder
                     },
                     tint = white,
                     modifier = Modifier.size(24.dp),

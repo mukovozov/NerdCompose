@@ -25,7 +25,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.*
 import androidx.navigation.compose.*
 import com.developer.amukovozov.nerd.R
-import com.developer.amukovozov.nerd.ui.screens.browse.Browse
+import com.developer.amukovozov.nerd.ui.screens.browse.BrowseScreen
+import com.developer.amukovozov.nerd.ui.screens.browse.BrowseViewModel
 import com.developer.amukovozov.nerd.ui.screens.feed.Feed
 import com.developer.amukovozov.nerd.ui.screens.feed.FeedScreen
 import com.developer.amukovozov.nerd.ui.screens.feed.FeedViewModel
@@ -62,6 +63,7 @@ fun Home(
             .navigationBarsPadding(),
         topBar = {
             if (selectedTab != HomeTab.Profile &&
+                selectedTab != HomeTab.Search &&
                 currentRoute != MovieDetailsScreen.Destination &&
                 currentRoute != FeedCreateScreen.Destination
             ) {
@@ -106,7 +108,10 @@ fun Home(
             navigation(HomeTab.Feed.route, FeedScreen.Destination) {
                 feedNestedNavigation(navController, innerPadding)
             }
-            composable(HomeTab.Search.route) { Browse(navController) }
+            composable(HomeTab.Search.route) {
+                val viewModel = hiltViewModel<BrowseViewModel>()
+                BrowseScreen(navController, viewModel)
+            }
             navigation(HomeTab.Profile.route, MyProfileScreen.Destination) {
                 profileNestedNavigation(navController, innerPadding)
             }
@@ -150,7 +155,7 @@ private fun NavGraphBuilder.feedNestedNavigation(
     innerPadding: PaddingValues
 ) {
     composable(HomeTab.Feed.route) {
-        val viewModel = hiltNavGraphViewModel<FeedViewModel>()
+        val viewModel = hiltViewModel<FeedViewModel>()
         Feed(viewModel, navController, Modifier.padding(innerPadding))
     }
 

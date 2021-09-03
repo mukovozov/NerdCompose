@@ -30,6 +30,9 @@ interface NerdApi {
     @GET("/user")
     fun getUserById(@Query("id") userId: Int): Single<UserInfoDetails>
 
+    @GET("users/popular")
+    fun getUsersPopular(): Single<List<UserInfo>>
+
     @GET("/followings")
     fun getMyFollowings(): Single<List<UserInfo>>
 
@@ -81,6 +84,9 @@ interface NerdApi {
     @GET("/movie/details")
     fun getMovieDetails(@Query("id") id: Int): Single<MovieDetails>
 
+    @GET("movies/popular")
+    fun getMoviesPopular(): Single<List<Movie>>
+
     @GET("/movies/search")
     fun searchMovies(@Query("query") query: String): Single<List<Movie>>
 
@@ -89,4 +95,7 @@ interface NerdApi {
 
     @GET("tags")
     fun getTags(): Single<List<Tag>>
+
+    @GET("movies/search")
+    fun searchMoviesByTag(@Query("tagId") id: Int): Single<List<Movie>>
 }
