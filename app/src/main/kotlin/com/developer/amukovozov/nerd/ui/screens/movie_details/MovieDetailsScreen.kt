@@ -38,6 +38,7 @@ import com.developer.amukovozov.nerd.ui.components.searchbar.LoadingScreen
 import com.developer.amukovozov.nerd.ui.screens.feed.ShortFeedReviewItem
 import com.developer.amukovozov.nerd.ui.screens.feed_create.FeedCreateScreen
 import com.developer.amukovozov.nerd.ui.theme.*
+import com.developer.amukovozov.nerd.util.openInChromeTab
 import com.developer.amukovozov.nerd.util.ui.*
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsHeight
@@ -140,7 +141,7 @@ fun MovieDetails(details: MovieDetails, onBackPressed: () -> Unit) {
 
 @Composable
 private fun CollapsableToolbar(
-    modifier :Modifier = Modifier,
+    modifier: Modifier = Modifier,
     scrollState: LazyListState,
     details: MovieDetails,
     onBackPressed: () -> Unit
@@ -288,15 +289,33 @@ private fun HeaderMovieInfo(details: MovieDetails) {
                 )
             }
 
-            details.availability?.let {
-                Text(
-                    text = "Где посмотреть ->",
-                    color = secondaryTextColor,
-                    style = MaterialTheme.typography.body1,
+            val context = getContext()
+            details.availability?.whereToRent?.let {
+                LazyRow(
                     modifier = Modifier
-                        .padding(start = 16.dp, top = 8.dp, end = 16.dp)
-                        .clickable { }
-                )
+                        .fillMaxWidth()
+                        .height(24.dp)
+                        .padding(start = 16.dp, top = 4.dp, end = 16.dp)
+                        .clickable { openInChromeTab(context, details.availability.link) }
+                    ,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    items(it) {
+                        Image(
+                            modifier = Modifier.size(16.dp),
+                            painter = rememberAvailablePlatformPainter(it.logoPath),
+                            contentDescription = null
+                        )
+                    }
+                }
+//                Text(
+//                    text = "Где посмотреть ->",
+//                    color = secondaryTextColor,
+//                    style = MaterialTheme.typography.body1,
+//                    modifier = Modifier
+//                        .padding(start = 16.dp, top = 8.dp, end = 16.dp)
+//                        .clickable { }
+//                )
             }
         }
 
@@ -515,7 +534,9 @@ private val details = MovieDetails(
     listOf(),
     null,
     AvailabilityInfo(
-        1, "", 1, ""
+        "link",
+        emptyList(),
+        emptyList()
     )
 )
 

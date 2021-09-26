@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltNavGraphViewModel
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.*
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.*
 import com.developer.amukovozov.nerd.R
 import com.developer.amukovozov.nerd.ui.screens.browse.BrowseScreen
@@ -92,7 +93,8 @@ fun Home(
         },
         bottomBar = {
             if (currentRoute != MovieDetailsScreen.Destination &&
-                currentRoute != FeedCreateScreen.Destination
+                currentRoute != FeedCreateScreen.Destination &&
+                currentRoute != ProfileScreen.Destination
             ) {
                 BottomNavigation {
                     navItems.forEach { screen ->
@@ -137,8 +139,11 @@ private fun RowScope.NerdBottomNavigationItem(
             onTabSelected.invoke(screen)
 
             navController.navigate(screen.route) {
-                popUpTo(navController.graph.startDestinationId)
+                popUpTo(navController.graph.findStartDestination().id) {
+                    saveState = true
+                }
                 launchSingleTop = true
+                restoreState = true
             }
         }
     )

@@ -1,7 +1,6 @@
 package com.developer.amukovozov.nerd.util.ui
 
 import androidx.annotation.DrawableRes
-import androidx.compose.material.icons.Icons
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntSize
@@ -13,8 +12,20 @@ import com.google.accompanist.imageloading.LoadPainter
 
 private const val TMDB_BASE_URL = "https://image.tmdb.org/t/p"
 private const val POSTER_WIDTH = "w500"
-private const val PROFILE_WIDTH = "w100"
+private const val PLATFORM_ICON_WIDTH = "w200"
 private const val BACKDROP_PATH = "w500"
+
+@Composable
+fun rememberAvailablePlatformPainter(
+    platformIconPath: String?,
+): LoadPainter<Any> {
+    return rememberTmdbCoilPainter(
+        PLATFORM_ICON_WIDTH,
+        platformIconPath,
+        R.drawable.ic_user_placeholder,
+        requestBuilder = { transformations(CircleCropTransformation()) }
+    )
+}
 
 @Composable
 fun rememberTmdbPosterPainter(

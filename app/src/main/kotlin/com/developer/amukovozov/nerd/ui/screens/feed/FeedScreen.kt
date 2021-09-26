@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -32,10 +33,7 @@ import com.developer.amukovozov.nerd.ui.components.TagsGroup
 import com.developer.amukovozov.nerd.ui.screens.movie_details.MovieDetailsScreen
 import com.developer.amukovozov.nerd.ui.theme.backgroundAccentColor
 import com.developer.amukovozov.nerd.ui.theme.primaryColor
-import com.developer.amukovozov.nerd.util.ui.Content
-import com.developer.amukovozov.nerd.util.ui.Loading
-import com.developer.amukovozov.nerd.util.ui.Stub
-import com.developer.amukovozov.nerd.util.ui.rememberTmdbPosterPainter
+import com.developer.amukovozov.nerd.util.ui.*
 import com.google.accompanist.coil.rememberCoilPainter
 import timber.log.Timber
 import java.util.*
@@ -130,14 +128,22 @@ fun FeedReviewItem(
                 .padding(16.dp)
                 .fillMaxWidth()
         ) {
-            Text(
-                text = feed.userInfo.nickname,
-                maxLines = 1,
-                style = MaterialTheme.typography.subtitle1,
-                modifier = Modifier
-                    .clickable { onUserClicked.invoke() }
-                    .padding(4.dp)
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Image(
+                    painter = rememberProfilePainter(feed.userInfo.avatarPath),
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp)
+                )
+                Text(
+                    text = feed.userInfo.nickname,
+                    maxLines = 1,
+                    style = MaterialTheme.typography.subtitle1,
+                    modifier = Modifier
+                        .clickable { onUserClicked.invoke() }
+                        .padding(4.dp)
+                        .padding(start = 8.dp)
+                )
+            }
             UserReviewBlock(feed, onReviewClicked)
             FeedLikeView(
                 feedId = feed.id,
@@ -160,8 +166,10 @@ fun ShortFeedReviewItem(feed: Feed, modifier: Modifier = Modifier) {
     )
     {
         Column(modifier = Modifier.padding(8.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.heightIn(min = 64.dp)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.heightIn(min = 64.dp)
+            ) {
                 Image(
                     painter = rememberCoilPainter(feed.userInfo.avatarPath),
                     contentScale = ContentScale.Crop,
@@ -195,6 +203,7 @@ fun ShortFeedReviewItem(feed: Feed, modifier: Modifier = Modifier) {
 private fun UserReviewBlock(feed: Feed, onReviewClicked: (movieId: Int) -> Unit) {
     Row(modifier = Modifier
         .fillMaxWidth()
+        .padding(top = 8.dp)
         .clickable { onReviewClicked.invoke(feed.movie.id) }) {
         Image(
             painter = rememberTmdbPosterPainter(feed.movie.posterPath),

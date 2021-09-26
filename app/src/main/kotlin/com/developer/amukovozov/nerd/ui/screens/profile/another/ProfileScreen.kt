@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,6 +18,7 @@ import com.developer.amukovozov.nerd.ui.screens.movie_details.MovieDetailsScreen
 import com.developer.amukovozov.nerd.ui.screens.profile.*
 import com.developer.amukovozov.nerd.ui.screens.profile_list.ProfileListScreen
 import com.developer.amukovozov.nerd.ui.screens.profile_list.ProfileListType
+import com.developer.amukovozov.nerd.ui.theme.backgroundAccentColor
 import com.developer.amukovozov.nerd.ui.theme.primaryColor
 import com.developer.amukovozov.nerd.util.openInChromeTab
 import com.developer.amukovozov.nerd.util.ui.Content
@@ -42,8 +45,19 @@ fun ProfileScreen(
 ) {
     viewModel.onScreenOpened(userId)
     Scaffold(
+        topBar = {
+            TopAppBar(
+                modifier = Modifier.statusBarsPadding(),
+                backgroundColor = backgroundAccentColor
+            ) {
+                IconButton(onClick = {
+                    navController.navigateUp()
+                }) {
+                    Icon(Icons.Filled.ArrowBack, contentDescription = null)
+                }
+            }
+        },
         modifier = modifier
-            .statusBarsPadding()
             .navigationBarsPadding()
     ) {
         val context = getContext()
@@ -168,7 +182,7 @@ private fun FollowButton(
         onClick = { onFollowButtonClicked.invoke(isFollowedByYou) },
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 8.dp)
+            .padding(top = 16.dp)
     ) {
         Text(text = text, style = MaterialTheme.typography.h6, modifier = Modifier.padding(8.dp))
     }
