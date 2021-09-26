@@ -8,9 +8,10 @@ object Libs {
     const val androidGradlePlugin = "com.android.tools.build:gradle:7.0.0"
 
     object Accompanist {
-        private const val version = "0.15.0"
-        const val coil = "com.google.accompanist:accompanist-coil:$version"
+        private const val version = "0.18.0"
+        const val coil = "io.coil-kt:coil-compose:1.3.2"
         const val insets = "com.google.accompanist:accompanist-insets:$version"
+        const val swipeToRefresh = "com.google.accompanist:accompanist-swiperefresh:$version"
     }
 
     object Kotlin {
@@ -60,7 +61,7 @@ object Libs {
 
         object Compose {
             const val snapshot = ""
-            const val version = "1.0.0"
+            const val version = "1.0.2"
 
             const val foundation = "androidx.compose.foundation:foundation:${version}"
             const val layout = "androidx.compose.foundation:foundation-layout:${version}"

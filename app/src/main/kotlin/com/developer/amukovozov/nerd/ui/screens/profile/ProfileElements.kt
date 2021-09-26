@@ -29,8 +29,8 @@ import com.developer.amukovozov.nerd.model.movie.Movie
 import com.developer.amukovozov.nerd.model.SocialMediaLink
 import com.developer.amukovozov.nerd.model.UserInfoDetails
 import com.developer.amukovozov.nerd.ui.theme.primaryColor
+import com.developer.amukovozov.nerd.util.ui.rememberProfilePainter
 import com.developer.amukovozov.nerd.util.ui.rememberTmdbPosterPainter
-import com.google.accompanist.coil.rememberCoilPainter
 
 @Composable
 fun UserPostsTitle(fullUserInfo: FullUserInfo) {
@@ -101,11 +101,7 @@ fun UserDescription(userInfo: UserInfoDetails) {
 fun MainProfileInfo(userInfo: UserInfoDetails) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Image(
-            painter = rememberCoilPainter(
-                request = userInfo.avatarPath,
-                requestBuilder = {
-                    transformations(CircleCropTransformation())
-                }),
+            painter = rememberProfilePainter(userInfo.avatarPath),
             modifier = Modifier
                 .height(64.dp)
                 .width(64.dp),

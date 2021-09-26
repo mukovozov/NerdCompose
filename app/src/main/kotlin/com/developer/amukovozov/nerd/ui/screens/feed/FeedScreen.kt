@@ -20,10 +20,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.rememberImagePainter
 import com.developer.amukovozov.nerd.model.UserInfo
 import com.developer.amukovozov.nerd.model.feed.Feed
 import com.developer.amukovozov.nerd.model.feed.FeedType
@@ -34,7 +34,8 @@ import com.developer.amukovozov.nerd.ui.screens.movie_details.MovieDetailsScreen
 import com.developer.amukovozov.nerd.ui.theme.backgroundAccentColor
 import com.developer.amukovozov.nerd.ui.theme.primaryColor
 import com.developer.amukovozov.nerd.util.ui.*
-import com.google.accompanist.coil.rememberCoilPainter
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.SwipeRefreshState
 import timber.log.Timber
 import java.util.*
 
@@ -66,7 +67,8 @@ fun Feed(
                         onPageEnded = viewModel::onPageEnded,
                         onReviewClicked = { movieId ->
                             navController.navigate(MovieDetailsScreen.createDestination(movieId))
-                        }
+                        },
+                        onRefresh = { viewModel.onPulledToRefresh() }
                     )
                 }
             }
@@ -83,29 +85,36 @@ fun FeedList(
     feeds: List<Feed>,
     onLikeClicked: (FeedId: Int, isLiked: Boolean) -> Unit,
     onReviewClicked: (movieId: Int) -> Unit,
-    onPageEnded: () -> Unit
+    onPageEnded: () -> Unit,
+    onRefresh: () -> Unit
 ) {
-    val listState = rememberLazyListState()
-    LazyColumn(state = listState) {
-        items(feeds) { feed ->
-            FeedReviewItem(
-                feed = feed,
-                onLikeClicked = onLikeClicked,
-                onReviewClicked = { movieId ->
-                    onReviewClicked.invoke(movieId)
-                },
-                onUserClicked = {}
-            )
-        }
-        if (listState.firstVisibleItemIndex > 1) {
-            Timber.d(listState.firstVisibleItemIndex.toString())
-            item {
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .wrapContentWidth(Alignment.CenterHorizontally)
+    val isRefreshingState = SwipeRefreshState(false)
+    SwipeRefresh(
+        state = isRefreshingState,
+        onRefresh = onRefresh
+    ) {
+        val listState = rememberLazyListState()
+        LazyColumn(state = listState) {
+            items(feeds) { feed ->
+                FeedReviewItem(
+                    feed = feed,
+                    onLikeClicked = onLikeClicked,
+                    onReviewClicked = { movieId ->
+                        onReviewClicked.invoke(movieId)
+                    },
+                    onUserClicked = {}
                 )
             }
-            onPageEnded.invoke()
+            if (listState.firstVisibleItemIndex > 1) {
+                Timber.d(listState.firstVisibleItemIndex.toString())
+                item {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .wrapContentWidth(Alignment.CenterHorizontally)
+                    )
+                }
+                onPageEnded.invoke()
+            }
         }
     }
 }
@@ -171,7 +180,7 @@ fun ShortFeedReviewItem(feed: Feed, modifier: Modifier = Modifier) {
                 modifier = Modifier.heightIn(min = 64.dp)
             ) {
                 Image(
-                    painter = rememberCoilPainter(feed.userInfo.avatarPath),
+                    painter = rememberImagePainter(feed.userInfo.avatarPath),
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .size(32.dp)

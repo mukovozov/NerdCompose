@@ -34,6 +34,10 @@ class FeedViewModel @Inject constructor(
         paginator.proceed(Paginator.Action.Refresh)
     }
 
+    fun onPulledToRefresh() {
+        paginator.proceed(Paginator.Action.Refresh)
+    }
+
     fun onPageEnded() {
         paginator.proceed(Paginator.Action.LoadMore)
     }
