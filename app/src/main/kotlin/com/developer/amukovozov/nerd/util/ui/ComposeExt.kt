@@ -45,6 +45,8 @@ fun rememberProfilePainter(
         builder = {
             crossfade(true)
             placeholder(R.drawable.ic_user_placeholder)
+            fallback(R.drawable.ic_user_placeholder)
+            error(R.drawable.ic_user_placeholder)
             transformations(CircleCropTransformation())
         }
     )
@@ -65,14 +67,17 @@ private fun rememberTmdbCoilPainter(
     imagePath: String?,
     //todo change placeholder
     @DrawableRes previewPlaceHolder: Int,
-    requestBuilder: (ImageRequest.Builder.() -> Unit) = {
-        crossfade(true)
-        placeholder(previewPlaceHolder)
-    },
+    requestBuilder: (ImageRequest.Builder.() -> Unit) = {},
 ): ImagePainter {
     return rememberImagePainter(
         data = "$TMDB_BASE_URL/$width/$imagePath",
-        builder = requestBuilder
+        builder = {
+            crossfade(true)
+            placeholder(previewPlaceHolder)
+            fallback(previewPlaceHolder)
+            error(previewPlaceHolder)
+            requestBuilder.invoke(this)
+        }
     )
 }
 
